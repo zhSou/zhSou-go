@@ -54,3 +54,17 @@ func (doc *Doc) Get(id int) (string, error) {
 	}
 	return res, nil
 }
+
+func (doc *Doc) GetAll() (keys []int, values []string, err error) {
+	doc.RLock()
+	defer doc.RUnlock()
+	keys = make([]int, len(doc.data))
+	values = make([]string, len(doc.data))
+	index := 0
+	for i, s := range doc.data {
+		keys[index] = i
+		values[index] = s
+		index++
+	}
+	return
+}

@@ -152,3 +152,49 @@ func TestDoc_RandomGetAndPut(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func TestDoc_GetAll(t *testing.T) {
+	doc := NewDoc()
+
+	id := 123
+	name := "foo name"
+	doc.Put(id, name)
+
+	keys, values, err := doc.GetAll()
+	require.NoError(t, err)
+	require.Equal(t, 1, len(keys))
+	require.Equal(t, 1, len(values))
+}
+
+func TestDoc_DupGetAll(t *testing.T) {
+	doc := NewDoc()
+	idBegin := 123
+	baseName := "foo name"
+	n := 100
+	wg := sync.WaitGroup{}
+
+	t.Parallel()
+
+	for i := 0; i < n; i++ {
+		i := i
+		wg.Add(1)
+		go func() {
+			doc.Put(idBegin+i, baseName+strconv.Itoa(i))
+			wg.Done()
+		}()
+	}
+	// 保证之前的Put操作完成
+	wg.Wait()
+
+	for i := 0; i < n; i++ {
+		wg.Add(1)
+		go func() {
+			keys, values, err := doc.GetAll()
+			require.NoError(t, err)
+			require.Len(t, keys, n)
+			require.Len(t, values, n)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+}
