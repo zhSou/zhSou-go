@@ -84,9 +84,11 @@ func (i *Index) IsInIndex(name string, docId int) (bool, error) {
 //  @return error
 //
 func (i *Index) Add(name string, docId int) error {
+	find, err := i.IsInIndex(name, docId)
+
+	// 在IsInIndex之后加锁，否则会出现死锁
 	i.Lock()
 	defer i.Unlock()
-	find, err := i.IsInIndex(name, docId)
 	// 如果不存在，则添加
 	if errors.Is(err, ErrIndexNotFound) {
 		docIds := make([]int, 0)
