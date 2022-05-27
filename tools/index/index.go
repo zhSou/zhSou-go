@@ -4,15 +4,19 @@ import (
 	"bufio"
 	"encoding/csv"
 	"encoding/gob"
+	"fmt"
 	"github.com/yanyiwu/gojieba"
 	"io"
 	"log"
 	"os"
 	"sort"
+	"sync"
 )
 
-var jieba *gojieba.Jieba
-var stopWords map[string]struct{}
+var (
+	jieba     *gojieba.Jieba
+	stopWords map[string]struct{}
+)
 
 /// 加载停用词表
 func loadStopWord() {
@@ -81,9 +85,9 @@ func makeIndex(inputCsvPath string, outputGobPath string) {
 	defer outputFile.Close()
 	enc := gob.NewEncoder(outputFile)
 	if err := enc.Encode(index); err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Gob文件写入失败：", err)
 	}
-	log.Println("成功输出：" + outputGobPath)
+	log.Println("Gob文件成功输出：" + outputGobPath)
 }
 func main() {
 	// 创建jieba实例
@@ -93,8 +97,18 @@ func main() {
 	// 加载停用词
 	loadStopWord()
 
-	// 对一亿条数据分别建立倒排索引并持久化输出为json文件
-	input := "C:\\Users\\i\\Desktop\\wukong50k_release.csv"
-	output := "C:\\Users\\i\\Desktop\\wukong_index.gob"
-	makeIndex(input, output)
+	// 对一亿条数据分别建立倒排索引并持久化输出为gob文件
+	for i := 0; i < 64; i++ {
+		var wg sync.WaitGroup
+		for j := 0; j < 4; j++ {
+			wg.Add(1)
+			go func(n int) {
+				defer wg.Done()
+				inputCsvPath := fmt.Sprintf("D:\\input\\wukong_100m_%d.csv", n)
+				outputGobPath := fmt.Sprintf("D:\\output\\wukong_100m_%d.gob", n)
+				makeIndex(inputCsvPath, outputGobPath)
+			}(i*4 + j)
+		}
+		wg.Wait()
+	}
 }
