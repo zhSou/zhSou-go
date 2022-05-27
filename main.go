@@ -5,9 +5,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/bytedance-basic/zhsou-go/core/model"
-	"github.com/bytedance-basic/zhsou-go/global"
-	"github.com/bytedance-basic/zhsou-go/initialize"
+	"github.com/zhSou/zhSou-go/core/model"
+	"github.com/zhSou/zhSou-go/global"
+	"github.com/zhSou/zhSou-go/initialize"
 )
 
 func main() {

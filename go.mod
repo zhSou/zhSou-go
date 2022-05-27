@@ -1,4 +1,4 @@
-module github.com/bytedance-basic/zhsou-go
+module github.com/zhSou/zhSou-go
 
 go 1.18
 
