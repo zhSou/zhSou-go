@@ -33,7 +33,7 @@ func search(text string) []string {
 			panic(err)
 
 		}
-		for _, docId := range *docIds {
+		for _, docId := range docIds {
 			doc, err := global.Doc.Get(docId)
 			if err != nil {
 				if errors.Is(err, model.ErrDocNotFound) {

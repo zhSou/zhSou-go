@@ -17,13 +17,13 @@ var (
 //  name : [ docId1, docId2, docId3 ]
 //
 type Index struct {
-	data map[string]*[]int
+	data map[string][]int
 	sync.RWMutex
 }
 
 func NewIndex() *Index {
 	return &Index{
-		data: make(map[string]*[]int),
+		data: make(map[string][]int),
 	}
 }
 
@@ -32,10 +32,10 @@ func NewIndex() *Index {
 //  @Description: 获取所有的索引
 //  @receiver i
 //  @param name
-//  @return *[]int
+//  @return []int
 //  @return error
 //
-func (i *Index) GetAll(name string) (*[]int, error) {
+func (i *Index) GetAll(name string) ([]int, error) {
 	i.RLock()
 	defer i.RUnlock()
 	if v, ok := i.data[name]; ok {
@@ -61,7 +61,7 @@ func (i *Index) IsInIndex(name string, docId int) (bool, error) {
 	i.RLock()
 	defer i.RUnlock()
 	if v, ok := i.data[name]; ok {
-		for _, id := range *v {
+		for _, id := range v {
 			if id == docId {
 				return true, nil
 			}
@@ -91,17 +91,13 @@ func (i *Index) Add(name string, docId int) error {
 	defer i.Unlock()
 	// 如果不存在，则添加
 	if errors.Is(err, ErrIndexNotFound) {
-		docIds := make([]int, 0)
-		docIds = append(docIds, docId)
-		i.data[name] = &docIds
+		i.data[name] = append(i.data[name], docId)
 		return nil
 	}
 	// 如果之前有索引，并且该文档id已经存在，则不添加
 	if find {
 		return ErrIndexExists
 	}
-	docIds := i.data[name]
-	*docIds = append(*docIds, docId)
-	i.data[name] = docIds
+	i.data[name] = append(i.data[name], docId)
 	return err
 }
