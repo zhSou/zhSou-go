@@ -5,12 +5,13 @@ import (
 	"encoding/csv"
 	"encoding/gob"
 	"fmt"
-	"github.com/yanyiwu/gojieba"
 	"io"
 	"log"
 	"os"
 	"sort"
 	"sync"
+
+	"github.com/yanyiwu/gojieba"
 )
 
 var (

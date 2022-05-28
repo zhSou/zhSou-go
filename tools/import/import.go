@@ -3,10 +3,11 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
-	"github.com/flower-corp/rosedb"
 	"io"
 	"log"
 	"os"
+
+	"github.com/flower-corp/rosedb"
 )
 
 func u32To4Bytes(n uint32, bs []byte) {
