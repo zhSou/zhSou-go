@@ -1,4 +1,4 @@
-package controller
+package api
 
 const (
 	Success      = 0
