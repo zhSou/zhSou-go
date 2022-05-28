@@ -66,6 +66,10 @@ func makeIndex(inputCsvPath string, outputGobPath string) {
 		if err != nil {
 			log.Fatalln("csv文件读取失败：", err)
 		}
+		// 跳过csv表头
+		if i == 0 {
+			continue
+		}
 		doc := cols[1]
 		for _, word := range jieba.CutForSearch(doc, true) {
 			// 过滤停用词
