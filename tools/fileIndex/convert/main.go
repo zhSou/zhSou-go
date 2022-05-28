@@ -106,7 +106,7 @@ func ConvertAndMakeFileIndex(inputCsvPath string, outputPath string, outputGobPa
 }
 
 func main() {
-	timing.Timing(func() {
+	diff := timing.Timing(func() {
 		for i := 0; i < 64; i++ {
 			var wg sync.WaitGroup
 			for j := 0; j < 4; j++ {
@@ -126,4 +126,6 @@ func main() {
 			wg.Wait()
 		}
 	})
+
+	log.Printf("执行总时长: %v\n", diff)
 }
