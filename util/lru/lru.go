@@ -5,7 +5,15 @@ import "container/list"
 type Key interface{}
 type Value interface{}
 
-type KV struct {
+type LRU interface {
+	Get(key Key) (value Value, ok bool)
+	Put(key Key, value Value)
+	Remove(key Key)
+	Len() int
+	Clear()
+}
+
+type kv struct {
 	key   Key
 	value Value
 }
@@ -27,7 +35,7 @@ func NewCache(maxCapacity int) *Cache {
 func (c *Cache) Get(key Key) (value Value, ok bool) {
 	if v, ok := c.table[key]; ok {
 		c.linkedList.MoveToFront(v)
-		return v.Value.(*KV).value, true
+		return v.Value.(*kv).value, true
 	}
 	return nil, false
 }
@@ -36,9 +44,9 @@ func (c *Cache) Get(key Key) (value Value, ok bool) {
 func (c *Cache) Put(key Key, value Value) {
 	if v, ok := c.table[key]; ok {
 		c.linkedList.MoveToFront(v)
-		v.Value.(*KV).value = value
+		v.Value.(*kv).value = value
 	} else {
-		c.table[key] = c.linkedList.PushFront(&KV{
+		c.table[key] = c.linkedList.PushFront(&kv{
 			key:   key,
 			value: value,
 		})
@@ -47,7 +55,7 @@ func (c *Cache) Put(key Key, value Value) {
 			e := c.linkedList.Back()
 			if e != nil {
 				c.linkedList.Remove(e)
-				kv := e.Value.(*KV)
+				kv := e.Value.(*kv)
 				delete(c.table, kv.key)
 			}
 		}
@@ -58,7 +66,7 @@ func (c *Cache) Put(key Key, value Value) {
 func (c *Cache) Remove(key Key) {
 	if v, ok := c.table[key]; ok {
 		c.linkedList.Remove(v)
-		kv := v.Value.(*KV)
+		kv := v.Value.(*kv)
 		delete(c.table, kv.key)
 	}
 }
