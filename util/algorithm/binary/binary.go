@@ -21,6 +21,9 @@ func FindFirstBigger[T Number](data RandomAccessible[T], target T) (id int) {
 		}
 	}
 	if data.Get(left) <= target {
+		left++
+	}
+	if left >= data.Len() {
 		return -1
 	}
 	return left

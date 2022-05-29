@@ -24,4 +24,8 @@ func TestFindFirstBigger(t *testing.T) {
 	// 不存在任何数字，故查找到的索引值恒为-1
 	assert.Equal(t, -1, FindFirstBigger[int](NewSliceAccessible([]int{}), 1))
 	assert.Equal(t, -1, FindFirstBigger[int](NewSliceAccessible([]int{}), 4))
+
+	s2 := []uint32{1, 3, 6}
+	as2 := &SliceAccessible[uint32]{s2}
+	assert.Equal(t, 1, FindFirstBigger[uint32](as2, 1))
 }
