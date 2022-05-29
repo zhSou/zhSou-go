@@ -8,6 +8,5 @@ import (
 
 var (
 	Index *model.InvertedIndex
-	Doc   *model.Doc
 	Jieba *gojieba.Jieba
 )

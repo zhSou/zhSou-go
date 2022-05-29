@@ -71,33 +71,3 @@ func (i *InvertedIndex) IsInIndex(name string, docId int) (bool, error) {
 		return false, ErrIndexNotFound
 	}
 }
-
-//
-// Add
-// 	@Description: 填加一个分词的索引
-//	如果该分词不存在，则创建一个新的索引
-//	如果该分词存在，但是该文档id不存在，则将该文档id添加到该分词的索引中
-//	如果该分词存在，且该文档id存在，则返回 ErrIndexExists
-//  @receiver i
-//  @param name
-//  @param docId
-//  @return error
-//
-func (i *InvertedIndex) Add(name string, docId int) error {
-	find, err := i.IsInIndex(name, docId)
-
-	// 在IsInIndex之后加锁，否则会出现死锁
-	i.Lock()
-	defer i.Unlock()
-	// 如果不存在，则添加
-	if errors.Is(err, ErrIndexNotFound) {
-		i.data[name] = append(i.data[name], docId)
-		return nil
-	}
-	// 如果之前有索引，并且该文档id已经存在，则不添加
-	if find {
-		return ErrIndexExists
-	}
-	i.data[name] = append(i.data[name], docId)
-	return err
-}
