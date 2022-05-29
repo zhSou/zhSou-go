@@ -121,3 +121,8 @@ func (r *DataReader) Read(id uint32) (*DataRecord, error) {
 		string(textBs),
 	}, nil
 }
+
+func (r *DataReader) Len() uint32 {
+	idA := r.indexFileSet.idArray
+	return idA[len(idA)-1]
+}

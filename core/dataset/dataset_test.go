@@ -115,4 +115,7 @@ func TestNewDataReader(t *testing.T) {
 	assert.Equal(t, "今年能跑赢96不?备战坦克两项俄军开始选拔参赛队员", dr.Text)
 	dr, _ = dataReader.Read(100000000)
 	assert.Equal(t, "光大银行福州分行成立二十周年发展纪实", dr.Text)
+
+	// 总数据量
+	assert.Equal(t, uint32(101483885), dataReader.Len())
 }
