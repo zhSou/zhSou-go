@@ -1,12 +1,13 @@
 package global
 
 import (
-	"github.com/yanyiwu/gojieba"
-
-	"github.com/zhSou/zhSou-go/core/model"
+	"github.com/zhSou/zhSou-go/util/tokenizer"
 )
 
 var (
-	Index *model.InvertedIndex
-	Jieba *gojieba.Jieba
+	Tokenizer *tokenizer.Tokenizer
 )
+
+func InitGlobal() {
+	Tokenizer = tokenizer.NewTokenizer()
+}
