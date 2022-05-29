@@ -3,6 +3,7 @@ package dataset
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"testing"
@@ -44,8 +45,13 @@ func buildTestIndexFile() []io.Reader {
 
 	return readers
 }
-
 func TestNewIndexFileSet(t *testing.T) {
+	rs := buildTestIndexFile()
+	indexFileSet := NewIndexFileSet(rs)
+	assert.NotNil(t, indexFileSet)
+}
+
+func TestIndexFileSet_Get(t *testing.T) {
 	rs := buildTestIndexFile()
 	indexFileSet := NewIndexFileSet(rs)
 	// 判断原结构体与反序列化后的结构体是否相等
@@ -83,5 +89,25 @@ func TestNewIndexFileSet(t *testing.T) {
 		fileId, indexItem := indexFileSet.Get(5)
 		assert.Equal(t, 2, fileId)
 		assert.Equal(t, mockIndexFiles[2].SeekInfo[2], *indexItem)
+	}
+}
+
+func TestNewDataReader(t *testing.T) {
+	var indexFilePaths, dataFilePaths []string
+	for i := 0; i < 256; i++ {
+		indexFilePaths = append(indexFilePaths, fmt.Sprintf("D:\\index\\wukong_100m_%d.gob", i))
+		dataFilePaths = append(dataFilePaths, fmt.Sprintf("D:\\after\\wukong_100m_%d.dat", i))
+	}
+	dataReader, err := NewDataReader(indexFilePaths, dataFilePaths)
+	if err != nil {
+		panic(err)
+	}
+	for i := 0; ; i += 100000 {
+		dataRecord, err := dataReader.Read(uint32(i))
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(i, dataRecord)
+
 	}
 }
