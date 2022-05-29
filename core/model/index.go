@@ -12,17 +12,17 @@ var (
 )
 
 //
-// Index
+// InvertedIndex
 //  @Description: 设计的存放倒排索引的数据结构
 //  name : [ docId1, docId2, docId3 ]
 //
-type Index struct {
+type InvertedIndex struct {
 	data map[string][]int
 	sync.RWMutex
 }
 
-func NewIndex() *Index {
-	return &Index{
+func NewIndex() *InvertedIndex {
+	return &InvertedIndex{
 		data: make(map[string][]int),
 	}
 }
@@ -35,7 +35,7 @@ func NewIndex() *Index {
 //  @return []int
 //  @return error
 //
-func (i *Index) GetAll(name string) ([]int, error) {
+func (i *InvertedIndex) GetAll(name string) ([]int, error) {
 	i.RLock()
 	defer i.RUnlock()
 	if v, ok := i.data[name]; ok {
@@ -57,7 +57,7 @@ func (i *Index) GetAll(name string) ([]int, error) {
 //  @return bool
 //  @return error
 //
-func (i *Index) IsInIndex(name string, docId int) (bool, error) {
+func (i *InvertedIndex) IsInIndex(name string, docId int) (bool, error) {
 	i.RLock()
 	defer i.RUnlock()
 	if v, ok := i.data[name]; ok {
@@ -83,7 +83,7 @@ func (i *Index) IsInIndex(name string, docId int) (bool, error) {
 //  @param docId
 //  @return error
 //
-func (i *Index) Add(name string, docId int) error {
+func (i *InvertedIndex) Add(name string, docId int) error {
 	find, err := i.IsInIndex(name, docId)
 
 	// 在IsInIndex之后加锁，否则会出现死锁

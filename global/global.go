@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	Index *model.Index
+	Index *model.InvertedIndex
 	Doc   *model.Doc
 	Jieba *gojieba.Jieba
 )
