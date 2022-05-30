@@ -3,9 +3,9 @@ package dataset
 import (
 	"encoding/csv"
 	"encoding/gob"
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/zhSou/zhSou-go/util/algorithm/binary"
+	"github.com/zhSou/zhSou-go/util/filesystem"
 	"io"
 	"log"
 	"os"
@@ -32,18 +32,20 @@ func (f *IndexFile) SaveToFile(path string) error {
 		log.Fatalf("Gob文件写入失败  path %s  err %v", path, err)
 		return err
 	}
-	log.Println("Gob文件成功输出：" + path)
+	log.Println("索引文件建立成功：" + path)
 	return nil
 }
 
 func ConvCsvMakeIndexFile(inputCsvPath string, outputDataPath string, outputIndexPath string) {
+	_ = filesystem.MakeDir(outputDataPath)
+	_ = filesystem.MakeDir(outputIndexPath)
 	file, err := os.Open(inputCsvPath)
 	if err != nil {
 		log.Printf("csv文件打开失败 path %s err %v", inputCsvPath, err)
 	}
 	defer file.Close()
 	reader := csv.NewReader(file)
-	log.Printf("打开成功 path %s ", inputCsvPath)
+	log.Println("csv文件打开成功", inputCsvPath)
 
 	outputFile, err := os.OpenFile(outputDataPath, os.O_RDWR|os.O_CREATE, 0777)
 	defer outputFile.Close()
@@ -59,7 +61,7 @@ func ConvCsvMakeIndexFile(inputCsvPath string, outputDataPath string, outputInde
 	for i := 0; ; i++ {
 		cols, err := reader.Read()
 		if err == io.EOF {
-			fmt.Println(i)
+			log.Println("转换完毕，该文件总记录数：", i)
 			break
 		}
 		if err != nil {
