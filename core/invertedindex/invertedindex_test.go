@@ -3,15 +3,16 @@ package invertedindex
 import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
+	"github.com/zhSou/zhSou-go/core/dict"
 	"testing"
 )
 
 func TestNewInvertedIndex(t *testing.T) {
-	assert.NotNil(t, NewInvertedIndex())
+	assert.NotNil(t, NewInvertedIndex(dict.NewDict()))
 }
 
 func TestInvertedIndex_Add(t *testing.T) {
-	ii := NewInvertedIndex()
+	ii := NewInvertedIndex(dict.NewDict())
 	ii.Add("w1", 5)
 	ii.Add("w1", 8)
 	ii.Add("w1", 1)
@@ -20,7 +21,7 @@ func TestInvertedIndex_Add(t *testing.T) {
 }
 
 func TestInvertedIndex_Sort(t *testing.T) {
-	ii := NewInvertedIndex()
+	ii := NewInvertedIndex(dict.NewDict())
 	ii.Add("w1", 5)
 	ii.Add("w1", 8)
 	ii.Add("w1", 1)
@@ -30,7 +31,7 @@ func TestInvertedIndex_Sort(t *testing.T) {
 }
 
 func TestInvertedIndex_SaveToDisk(t *testing.T) {
-	ii := NewInvertedIndex()
+	ii := NewInvertedIndex(dict.NewDict())
 	ii.Add("w1", 5)
 	ii.Add("w1", 8)
 	ii.Add("w1", 1)

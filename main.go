@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/zhSou/zhSou-go/core/config"
 	"github.com/zhSou/zhSou-go/core/dataset"
+	"github.com/zhSou/zhSou-go/core/dict"
 	"github.com/zhSou/zhSou-go/core/invertedindex"
 	"github.com/zhSou/zhSou-go/global"
 	"github.com/zhSou/zhSou-go/util/filesystem"
 	menu "github.com/zhSou/zhSou-go/util/menu"
 	"log"
 	"os"
+	"sync"
 )
 
 func InitConfig() *config.Config {
@@ -18,9 +20,10 @@ func InitConfig() *config.Config {
 		DataIndexPaths:        []string{},
 		CsvPaths:              []string{},
 		InvertedIndexFilePath: "D:\\inverted_index.inv",
+		DictPath:              "D:\\dict.dic",
 		StopWordPath:          "D:\\stop_words.txt",
-		ImportCsvCoroutines:   4,
-		PathLength:            256,
+		ImportCsvCoroutines:   2,
+		PathLength:            4,
 	}
 	for i := 0; i < conf.PathLength; i++ {
 		conf.DataPaths = append(conf.DataPaths, fmt.Sprintf("D:\\data\\wukong_100m_%d.dat", i))
@@ -33,25 +36,31 @@ func InitConfig() *config.Config {
 func ImportCsvHandler() {
 	conf := global.Config
 	ch := make(chan int)
-	for i := 0; i < conf.PathLength; i++ {
-		ch <- i
-	}
+	var wg sync.WaitGroup
 	for i := 0; i < conf.ImportCsvCoroutines; i++ {
+		wg.Add(1)
 		go func() {
-			for len(ch) > 0 {
-				id := <-ch
+			defer wg.Done()
+			for id := range ch {
 				dataset.ConvCsvMakeIndexFile(conf.CsvPaths[id], conf.DataPaths[id], conf.DataIndexPaths[id])
 			}
 		}()
 	}
+	for i := 0; i < conf.PathLength; i++ {
+		ch <- i
+	}
+	// 关闭通道，可以使得for range退出
+	close(ch)
+	// 等待开启的所有协程组退出
+	wg.Wait()
 }
 
 func MakeInvertedIndexHandler() {
 	conf := global.Config
 	dataReader := global.DataReader
 	log.Println("总数据记录数：", dataReader.Len())
-
-	inv := invertedindex.NewInvertedIndex()
+	dic := dict.NewDict()
+	inv := invertedindex.NewInvertedIndex(dic)
 	// TODO 可以并行优化
 	for i := uint32(0); i < dataReader.Len(); i++ {
 		dataRecord, err := dataReader.Read(i)
@@ -74,11 +83,19 @@ func MakeInvertedIndexHandler() {
 	}
 	// 倒排索引升序排序
 	inv.Sort()
+
+	// 倒排索引存盘
 	invFile, _ := os.OpenFile(conf.InvertedIndexFilePath, os.O_RDWR|os.O_CREATE, 0777)
 	defer invFile.Close()
 	_ = inv.SaveToDisk(invFile)
 	_ = invFile.Sync()
 	log.Println("倒排索引文件已存盘：", conf.InvertedIndexFilePath)
+
+	dicFile, _ := os.OpenFile(conf.DictPath, os.O_RDWR|os.O_CREATE, 0777)
+	defer dicFile.Close()
+	_ = dic.Save(dicFile)
+	_ = dicFile.Sync()
+	log.Println("词典文件已存盘：", conf.DictPath)
 }
 
 func QueryInvertedIndexHandler() {

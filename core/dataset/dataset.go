@@ -62,7 +62,7 @@ func ConvCsvMakeIndexFile(inputCsvPath string, outputDataPath string, outputInde
 	for i := 0; ; i++ {
 		cols, err := reader.Read()
 		if err == io.EOF {
-			log.Println("转换完毕，该文件总记录数：", i)
+			log.Println("转换完毕，文件：", outputDataPath, "总记录数：", i)
 			break
 		}
 		if err != nil {

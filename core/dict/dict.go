@@ -49,3 +49,7 @@ func (d *Dict) Get(word string) int {
 	}
 	return i
 }
+
+func (d *Dict) Len() int {
+	return len(d.Data)
+}

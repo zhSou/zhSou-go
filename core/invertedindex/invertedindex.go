@@ -2,18 +2,21 @@ package invertedindex
 
 import (
 	"encoding/gob"
+	"github.com/zhSou/zhSou-go/core/dict"
 	"github.com/zhSou/zhSou-go/util/algorithm/set"
 	"io"
 	"sort"
 )
 
 type invertedIndex struct {
-	Data map[string][]int
+	Data map[int][]int
+	dict *dict.Dict
 }
 
-func NewInvertedIndex() *invertedIndex {
+func NewInvertedIndex(dict *dict.Dict) *invertedIndex {
 	return &invertedIndex{
-		Data: make(map[string][]int),
+		Data: make(map[int][]int),
+		dict: dict,
 	}
 }
 
@@ -35,17 +38,21 @@ func (i *invertedIndex) SaveToDisk(w io.Writer) error {
 }
 
 func (i *invertedIndex) Add(word string, id int) {
-	i.Data[word] = append(i.Data[word], id)
+	wordId := i.dict.Put(word)
+	i.Data[wordId] = append(i.Data[wordId], id)
 }
 
 func (i *invertedIndex) AddWords(words []string, id int) {
 	for _, word := range set.Deduplication[string](words) {
-		i.Data[word] = append(i.Data[word], id)
+		wordId := i.dict.Put(word)
+		i.Data[wordId] = append(i.Data[wordId], id)
 	}
 }
 
 func (i *invertedIndex) Get(word string) []int {
-	return i.Data[word]
+	wordId := i.dict.Put(word)
+
+	return i.Data[wordId]
 }
 
 func (i *invertedIndex) Sort() {

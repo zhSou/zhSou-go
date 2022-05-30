@@ -33,6 +33,19 @@ func TestDict_Get(t *testing.T) {
 	assert.Equal(t, -1, dict.Get("C"))
 }
 
+func TestDict_Len(t *testing.T) {
+	dict := NewDict()
+	// 正常情况
+	assert.Equal(t, 0, dict.Len())
+
+	assert.Equal(t, 0, dict.Put("A"))
+	assert.Equal(t, 1, dict.Len())
+
+	assert.Equal(t, 1, dict.Put("B"))
+	assert.Equal(t, 2, dict.Len())
+
+}
+
 func TestDict_Save(t *testing.T) {
 	dict := NewDict()
 	dict.Put("A")
