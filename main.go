@@ -28,6 +28,7 @@ func InitConfig() *config.Config {
 		ImportCsvCoroutines:         4,
 		MakeInvertedIndexCoroutines: 8,
 		PathLength:                  256,
+		SearchLruMaxCapacity:        20,
 	}
 	for i := 0; i < conf.PathLength; i++ {
 		conf.DataPaths = append(conf.DataPaths, fmt.Sprintf("D:\\data\\wukong_100m_%d.dat", i))
@@ -49,6 +50,7 @@ func InitConfig1() *config.Config {
 		ImportCsvCoroutines:         4,
 		MakeInvertedIndexCoroutines: 8,
 		PathLength:                  1,
+		SearchLruMaxCapacity:        20,
 	}
 	for i := 0; i < conf.PathLength; i++ {
 		conf.DataPaths = append(conf.DataPaths, fmt.Sprintf("D:\\light\\data\\wukong_100m_%d.dat", i))
