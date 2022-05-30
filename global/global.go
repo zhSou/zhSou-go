@@ -11,6 +11,7 @@ var (
 	Tokenizer     *tokenizer.Tokenizer
 	StopWordTable *stopword.Table
 	DataReader    *dataset.DataReader
+	Config        *config.Config
 )
 
 func InitGlobal(conf *config.Config) {
@@ -26,4 +27,5 @@ func InitGlobal(conf *config.Config) {
 		return false
 	})
 	DataReader, _ = dataset.NewDataReader(conf.DataIndexPaths, conf.DataPaths)
+	Config = conf
 }
