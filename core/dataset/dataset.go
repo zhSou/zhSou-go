@@ -3,7 +3,6 @@ package dataset
 import (
 	"encoding/csv"
 	"encoding/gob"
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/zhSou/zhSou-go/util/algorithm/binary"
 	"github.com/zhSou/zhSou-go/util/filesystem"
@@ -143,7 +142,6 @@ type DataReader struct {
 
 func (r *DataReader) Close() {
 	for _, file := range r.fileCache {
-		fmt.Println(file)
 		if file == nil {
 			continue
 		}
@@ -155,36 +153,37 @@ func (r *DataReader) Close() {
 		log.Println("文件关闭成功：", file.Name())
 	}
 }
-func NewDataReader(indexFilePaths []string, dataFilePaths []string) (*DataReader, error) {
+
+func (r *DataReader) loadIndexFile() error {
 	log.Println("加载数据文件索引...")
-	if len(indexFilePaths) != len(dataFilePaths) {
-		return nil, errors.New("索引文件集与数据文件集数量不一致")
+	if len(r.indexFilePaths) != len(r.dataFilePaths) {
+		return errors.New("索引文件集与数据文件集数量不一致")
 	}
 	var indexFileSetReaders []io.Reader
 	var indexFiles []*os.File
-	var fileCache []*os.File
 
-	for _, path := range indexFilePaths {
+	for _, path := range r.indexFilePaths {
 		indexFile, err := os.Open(path)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		indexFileSetReaders = append(indexFileSetReaders, indexFile)
 		indexFiles = append(indexFiles, indexFile)
-		fileCache = append(fileCache, nil)
+		r.fileCache = append(r.fileCache, nil)
 	}
 
-	indexFileSet := NewIndexFileSet(indexFileSetReaders)
+	r.indexFileSet = NewIndexFileSet(indexFileSetReaders)
 
 	for _, file := range indexFiles {
 		_ = file.Close()
 	}
+	return nil
+}
+func NewDataReader(indexFilePaths []string, dataFilePaths []string) (*DataReader, error) {
 
 	return &DataReader{
 		indexFilePaths: indexFilePaths,
 		dataFilePaths:  dataFilePaths,
-		indexFileSet:   indexFileSet,
-		fileCache:      fileCache,
 	}, nil
 }
 
@@ -209,6 +208,14 @@ type DataRecord struct {
 }
 
 func (r *DataReader) Read(id uint32) (*DataRecord, error) {
+
+	if r.indexFileSet == nil {
+		// 还没加载索引文件
+		err := r.loadIndexFile()
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	fileId, seekInfo := r.indexFileSet.Get(id)
 	fileReader, err := r.getReaderAt(fileId)

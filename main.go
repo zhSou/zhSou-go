@@ -22,9 +22,9 @@ func InitConfig() *config.Config {
 		InvertedIndexFilePath:       "D:\\inverted_index.inv",
 		DictPath:                    "D:\\dict.dic",
 		StopWordPath:                "D:\\stop_words.txt",
-		ImportCsvCoroutines:         2,
+		ImportCsvCoroutines:         4,
 		MakeInvertedIndexCoroutines: 8,
-		PathLength:                  2,
+		PathLength:                  256,
 	}
 	for i := 0; i < conf.PathLength; i++ {
 		conf.DataPaths = append(conf.DataPaths, fmt.Sprintf("D:\\data\\wukong_100m_%d.dat", i))
@@ -58,7 +58,7 @@ func ImportCsvHandler() {
 
 func MakeInvertedIndexHandler() {
 	conf := global.Config
-	dataReader := global.DataReader
+	dataReader := global.GetDataReader()
 	log.Println("总数据记录数：", dataReader.Len())
 	dic := dict.NewDict()                      // 字典
 	inv := invertedindex.NewInvertedIndex(dic) // 倒排索引
@@ -75,8 +75,8 @@ func MakeInvertedIndexHandler() {
 					return
 				}
 				var words []string
-				for _, word := range global.Tokenizer.Cut(dataRecord.Text) {
-					if global.StopWordTable.IsStopWord(word) {
+				for _, word := range global.GetTokenizer().Cut(dataRecord.Text) {
+					if global.GetStopWordTable().IsStopWord(word) {
 						// 停用词过滤
 						continue
 					}
@@ -135,11 +135,13 @@ func QueryInvertedIndexHandler() {
 	_, _ = fmt.Scanln(&keyword)
 
 	is := inv.Get(keyword)
+
+	dataReader := global.GetDataReader()
 	for i, id := range is {
 		if i >= 10 {
 			break
 		}
-		record, _ := global.DataReader.Read(uint32(id))
+		record, _ := dataReader.Read(uint32(id))
 		fmt.Println(i, id, record.Text)
 	}
 }
@@ -149,7 +151,6 @@ func ClearHandler() {
 	for _, dataPath := range conf.DataPaths {
 		filesystem.DeleteFile(dataPath)
 	}
-	global.DataReader.Close()
 	for _, idxPath := range conf.DataIndexPaths {
 		filesystem.DeleteFile(idxPath)
 	}
