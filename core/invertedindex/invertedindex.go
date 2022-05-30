@@ -20,12 +20,13 @@ func NewInvertedIndex(dict *dict.Dict) *invertedIndex {
 	}
 }
 
-func LoadInvertedIndexFromDisk(r io.Reader) (*invertedIndex, error) {
+func LoadInvertedIndexFromDisk(r io.Reader, dict *dict.Dict) (*invertedIndex, error) {
 	ii := invertedIndex{}
 	err := gob.NewDecoder(r).Decode(&ii)
 	if err != nil {
 		return nil, err
 	}
+	ii.dict = dict
 	return &ii, nil
 }
 

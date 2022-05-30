@@ -100,9 +100,15 @@ func MakeInvertedIndexHandler() {
 
 func QueryInvertedIndexHandler() {
 	conf := global.Config
-	file, _ := os.Open(conf.InvertedIndexFilePath)
-	defer file.Close()
-	inv, _ := invertedindex.LoadInvertedIndexFromDisk(file)
+	log.Println("加载字典文件")
+	dictFile, _ := os.Open(conf.DictPath)
+	defer dictFile.Close()
+	dic, _ := dict.Load(dictFile)
+
+	log.Println("加载倒排索引文件")
+	invFile, _ := os.Open(conf.InvertedIndexFilePath)
+	defer invFile.Close()
+	inv, _ := invertedindex.LoadInvertedIndexFromDisk(invFile, dic)
 
 	fmt.Printf("请输入查找关键词：")
 	var keyword string
