@@ -139,6 +139,7 @@ type DataReader struct {
 }
 
 func NewDataReader(indexFilePaths []string, dataFilePaths []string) (*DataReader, error) {
+	log.Println("加载数据文件索引...")
 	if len(indexFilePaths) != len(dataFilePaths) {
 		return nil, errors.New("索引文件集与数据文件集数量不一致")
 	}
