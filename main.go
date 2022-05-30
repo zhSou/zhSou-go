@@ -37,6 +37,7 @@ func InitConfig() *config.Config {
 	return &conf
 }
 
+// InitConfig1 测试时候可以用这个轻量级配置文件，只加载一个数据集
 func InitConfig1() *config.Config {
 	var conf = config.Config{
 		DataPaths:                   []string{},
