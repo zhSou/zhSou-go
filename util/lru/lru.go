@@ -5,14 +5,6 @@ import "container/list"
 type Key interface{}
 type Value interface{}
 
-type LRU interface {
-	Get(key Key) (value Value, ok bool)
-	Put(key Key, value Value)
-	Remove(key Key)
-	Len() int
-	Clear()
-}
-
 type kv struct {
 	key   Key
 	value Value

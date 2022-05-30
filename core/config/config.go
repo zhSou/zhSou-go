@@ -10,4 +10,5 @@ type Config struct {
 	StopWordPath                string   `json:"stopWordPath"`          // 停用词表
 	ImportCsvCoroutines         int      // 导入csv文件时的并发数
 	MakeInvertedIndexCoroutines int      // 构造倒排索引的并发数
+	SearchLruMaxCapacity        int      // 最外层搜索的lru缓存大小
 }

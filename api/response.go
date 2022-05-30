@@ -5,29 +5,29 @@ const (
 	UnknownError = 1
 )
 
-type ApiResponse struct {
+type Response struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data"`
 }
 
-func BuildSuccessResponse(data interface{}) *ApiResponse {
-	return &ApiResponse{
+func BuildSuccessResponse(data interface{}) *Response {
+	return &Response{
 		Code: Success,
 		Msg:  "Success",
 		Data: data,
 	}
 }
 
-func BuildErrorResponse(code int, msg string) *ApiResponse {
-	return &ApiResponse{
+func BuildErrorResponse(code int, msg string) *Response {
+	return &Response{
 		Code: code,
 		Msg:  msg,
 	}
 }
 
-func BuildUnknownErrorResponse(err error) *ApiResponse {
-	return &ApiResponse{
+func BuildUnknownErrorResponse(err error) *Response {
+	return &Response{
 		Code: UnknownError,
 		Msg:  err.Error(),
 	}

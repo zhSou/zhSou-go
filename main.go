@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/zhSou/zhSou-go/api"
 	"github.com/zhSou/zhSou-go/core/config"
 	"github.com/zhSou/zhSou-go/core/dataset"
 	"github.com/zhSou/zhSou-go/core/dict"
 	"github.com/zhSou/zhSou-go/core/invertedindex"
 	"github.com/zhSou/zhSou-go/global"
-	"github.com/zhSou/zhSou-go/util/algorithm/set"
+	"github.com/zhSou/zhSou-go/service"
 	"github.com/zhSou/zhSou-go/util/filesystem"
 	menu "github.com/zhSou/zhSou-go/util/menu"
 	"log"
@@ -31,6 +32,26 @@ func InitConfig() *config.Config {
 	for i := 0; i < conf.PathLength; i++ {
 		conf.DataPaths = append(conf.DataPaths, fmt.Sprintf("D:\\data\\wukong_100m_%d.dat", i))
 		conf.DataIndexPaths = append(conf.DataIndexPaths, fmt.Sprintf("D:\\index\\wukong_100m_%d.idx", i))
+		conf.CsvPaths = append(conf.CsvPaths, fmt.Sprintf("D:\\input\\wukong_100m_%d.csv", i))
+	}
+	return &conf
+}
+
+func InitConfig1() *config.Config {
+	var conf = config.Config{
+		DataPaths:                   []string{},
+		DataIndexPaths:              []string{},
+		CsvPaths:                    []string{},
+		InvertedIndexFilePath:       "D:\\light\\inverted_index.inv",
+		DictPath:                    "D:\\light\\dict.dic",
+		StopWordPath:                "D:\\stop_words.txt",
+		ImportCsvCoroutines:         4,
+		MakeInvertedIndexCoroutines: 8,
+		PathLength:                  1,
+	}
+	for i := 0; i < conf.PathLength; i++ {
+		conf.DataPaths = append(conf.DataPaths, fmt.Sprintf("D:\\light\\data\\wukong_100m_%d.dat", i))
+		conf.DataIndexPaths = append(conf.DataIndexPaths, fmt.Sprintf("D:\\light\\index\\wukong_100m_%d.idx", i))
 		conf.CsvPaths = append(conf.CsvPaths, fmt.Sprintf("D:\\input\\wukong_100m_%d.csv", i))
 	}
 	return &conf
@@ -118,35 +139,7 @@ func MakeInvertedIndexHandler() {
 	log.Println("词典文件已存盘：", conf.DictPath)
 }
 
-func Search(query string) []int {
-	dic := global.GetDict()
-	inv := global.GetInvertedIndex()
-	tkn := global.GetTokenizer()
-
-	// 计算查询分词id(过滤所有不存在的分词)
-	var queryWordIds []int
-	var queryWordDocs [][]int
-	for _, kw := range tkn.Cut(query) {
-		if id := dic.Get(kw); id != -1 {
-			queryWordIds = append(queryWordIds, id)
-			queryWordDocs = append(queryWordDocs, inv.Get(kw))
-		}
-	}
-
-	// 计算所有查询分词的交集
-	var crossResult []int
-	for i := 0; i < len(queryWordDocs); i++ {
-		if i == 0 {
-			crossResult = queryWordDocs[0]
-			continue
-		}
-		crossResult = set.Cross(crossResult, queryWordDocs[i])
-	}
-	return crossResult
-}
-
 func QueryInvertedIndexHandler() {
-
 	for {
 		var keywords string
 		fmt.Printf("请输入查找关键词：")
@@ -158,7 +151,7 @@ func QueryInvertedIndexHandler() {
 
 		var searchResult []int
 		startTime := time.Now()
-		searchResult = Search(keywords)
+		searchResult = service.Search(keywords)
 		fmt.Printf("搜索结果：%d条 搜索用时：%.2fs\n", len(searchResult), time.Since(startTime).Seconds())
 
 		fmt.Println("以下预览前十条结果")
@@ -196,13 +189,13 @@ func Preload() {
 	}
 }
 func main() {
-	global.InitGlobal(InitConfig())
+	global.InitGlobal(InitConfig1())
 	mainMenu := menu.NewMenu("主菜单")
 	mainMenu.AddItem("csv数据集导入", ImportCsvHandler)
 	mainMenu.AddItem("构建倒排索引", MakeInvertedIndexHandler)
 	mainMenu.AddItem("查询", QueryInvertedIndexHandler)
 	mainMenu.AddItem("预加载", Preload)
-	mainMenu.AddItem("启动查询服务器", func() {})
+	mainMenu.AddItem("启动查询服务器", api.StartServer)
 	mainMenu.AddItem("清理相关文件", ClearHandler)
 	mainMenu.AddExitItem("退出")
 	mainMenu.Loop()
