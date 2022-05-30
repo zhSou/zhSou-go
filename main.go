@@ -6,6 +6,7 @@ import (
 	"github.com/zhSou/zhSou-go/core/dataset"
 	"github.com/zhSou/zhSou-go/core/invertedindex"
 	"github.com/zhSou/zhSou-go/global"
+	"github.com/zhSou/zhSou-go/util/filesystem"
 	menu "github.com/zhSou/zhSou-go/util/menu"
 	"log"
 	"os"
@@ -100,6 +101,19 @@ func QueryInvertedIndexHandler() {
 	}
 }
 
+func ClearHandler() {
+	conf := global.Config
+	for _, dataPath := range conf.DataPaths {
+		filesystem.DeleteFile(dataPath)
+	}
+	global.DataReader.Close()
+	for _, idxPath := range conf.DataIndexPaths {
+		filesystem.DeleteFile(idxPath)
+	}
+	log.Println("程序即将退出")
+	os.Exit(0)
+}
+
 func main() {
 	global.InitGlobal(InitConfig())
 	mainMenu := menu.NewMenu("主菜单")
@@ -107,6 +121,7 @@ func main() {
 	mainMenu.AddItem("构建倒排索引", MakeInvertedIndexHandler)
 	mainMenu.AddItem("查询倒排索引", QueryInvertedIndexHandler)
 	mainMenu.AddItem("启动查询服务器", func() {})
+	mainMenu.AddItem("清理相关文件", ClearHandler)
 	mainMenu.AddExitItem("退出")
 	mainMenu.Loop()
 }

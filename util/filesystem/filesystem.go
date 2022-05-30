@@ -37,3 +37,13 @@ func MakeDir(filepath string) error {
 	log.Println("新建文件夹：", dirPath)
 	return nil
 }
+
+func DeleteFile(filepath string) bool {
+	err := os.Remove(filepath)
+
+	if err == nil {
+		log.Println("成功删除文件：", filepath)
+		return true
+	}
+	return false
+}

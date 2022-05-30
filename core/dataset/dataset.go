@@ -3,6 +3,7 @@ package dataset
 import (
 	"encoding/csv"
 	"encoding/gob"
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/zhSou/zhSou-go/util/algorithm/binary"
 	"github.com/zhSou/zhSou-go/util/filesystem"
@@ -135,16 +136,31 @@ type DataReader struct {
 	indexFilePaths []string
 	dataFilePaths  []string
 	indexFileSet   *IndexFileSet
-	fileCache      []io.ReaderAt
+	fileCache      []*os.File
 }
 
+func (r *DataReader) Close() {
+	for _, file := range r.fileCache {
+		fmt.Println(file)
+		if file == nil {
+			continue
+		}
+		err := file.Close()
+		if err != nil {
+			log.Println("文件关闭失败：", file.Name())
+			continue
+		}
+		log.Println("文件关闭成功：", file.Name())
+	}
+}
 func NewDataReader(indexFilePaths []string, dataFilePaths []string) (*DataReader, error) {
 	log.Println("加载数据文件索引...")
 	if len(indexFilePaths) != len(dataFilePaths) {
 		return nil, errors.New("索引文件集与数据文件集数量不一致")
 	}
 	var indexFileSetReaders []io.Reader
-	var fileCache []io.ReaderAt
+	var indexFiles []*os.File
+	var fileCache []*os.File
 
 	for _, path := range indexFilePaths {
 		indexFile, err := os.Open(path)
@@ -152,12 +168,20 @@ func NewDataReader(indexFilePaths []string, dataFilePaths []string) (*DataReader
 			return nil, err
 		}
 		indexFileSetReaders = append(indexFileSetReaders, indexFile)
+		indexFiles = append(indexFiles, indexFile)
 		fileCache = append(fileCache, nil)
 	}
+
+	indexFileSet := NewIndexFileSet(indexFileSetReaders)
+
+	for _, file := range indexFiles {
+		_ = file.Close()
+	}
+
 	return &DataReader{
 		indexFilePaths: indexFilePaths,
 		dataFilePaths:  dataFilePaths,
-		indexFileSet:   NewIndexFileSet(indexFileSetReaders),
+		indexFileSet:   indexFileSet,
 		fileCache:      fileCache,
 	}, nil
 }
