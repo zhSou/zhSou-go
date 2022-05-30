@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 )
 
 func InitConfig() *config.Config {
@@ -87,10 +88,14 @@ func MakeInvertedIndexHandler() {
 		}()
 	}
 
+	startTime := time.Now()
 	for i := uint32(0); i < dataReader.Len(); i++ {
 		ch <- i
 		if i%100000 == 0 {
-			log.Printf("当前建立倒排索引百分比 %.2f", float64(i)/float64(dataReader.Len()))
+			useTime := time.Since(startTime)
+			progress := float64(i) / float64(dataReader.Len())
+			remainTime := int((useTime.Seconds() / progress) * (1 - progress))
+			log.Printf("任务百分比 %.2f 已用时：%ds预计剩余时间：%ds", progress, int(useTime.Seconds()), remainTime)
 		}
 	}
 	close(ch)

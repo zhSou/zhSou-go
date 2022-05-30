@@ -233,6 +233,10 @@ func (r *DataReader) Read(id uint32) (*DataRecord, error) {
 }
 
 func (r *DataReader) Len() uint32 {
+	if r.indexFileSet == nil {
+		// 还没加载索引文件
+		_ = r.loadIndexFile()
+	}
 	idA := r.indexFileSet.idArray
 	return idA[len(idA)-1]
 }
