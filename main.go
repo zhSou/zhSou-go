@@ -192,7 +192,19 @@ func Preload() {
 	}
 }
 func main() {
-	global.InitGlobal(InitConfig1())
+	var conf *config.Config
+	configMenu := menu.NewMenu("请选择配置文件")
+	configMenu.AddItem("1亿数据量", func() {
+		conf = InitConfig()
+		configMenu.StopForNextLoop()
+	})
+	configMenu.AddItem("30w数据量", func() {
+		conf = InitConfig1()
+		configMenu.StopForNextLoop()
+	})
+	configMenu.Loop()
+	global.InitGlobal(conf)
+
 	mainMenu := menu.NewMenu("主菜单")
 	mainMenu.AddItem("csv数据集导入", ImportCsvHandler)
 	mainMenu.AddItem("构建倒排索引", MakeInvertedIndexHandler)
