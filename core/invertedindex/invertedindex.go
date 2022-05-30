@@ -6,11 +6,13 @@ import (
 	"github.com/zhSou/zhSou-go/util/algorithm/set"
 	"io"
 	"sort"
+	"sync"
 )
 
 type invertedIndex struct {
-	Data map[int][]int
-	dict *dict.Dict
+	mutex sync.RWMutex
+	Data  map[int][]int
+	dict  *dict.Dict
 }
 
 func NewInvertedIndex(dict *dict.Dict) *invertedIndex {
@@ -39,11 +41,15 @@ func (i *invertedIndex) SaveToDisk(w io.Writer) error {
 }
 
 func (i *invertedIndex) Add(word string, id int) {
+	i.mutex.Lock()
+	defer i.mutex.Unlock()
 	wordId := i.dict.Put(word)
 	i.Data[wordId] = append(i.Data[wordId], id)
 }
 
 func (i *invertedIndex) AddWords(words []string, id int) {
+	i.mutex.Lock()
+	defer i.mutex.Unlock()
 	for _, word := range set.Deduplication[string](words) {
 		wordId := i.dict.Put(word)
 		i.Data[wordId] = append(i.Data[wordId], id)
@@ -51,8 +57,9 @@ func (i *invertedIndex) AddWords(words []string, id int) {
 }
 
 func (i *invertedIndex) Get(word string) []int {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
 	wordId := i.dict.Put(word)
-
 	return i.Data[wordId]
 }
 

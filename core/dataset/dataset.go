@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sync"
 )
 
 // SeekInfo 存放某条记录的寻址信息
@@ -137,6 +138,7 @@ type DataReader struct {
 	dataFilePaths  []string
 	indexFileSet   *IndexFileSet
 	fileCache      []*os.File
+	mutex          sync.Mutex // 懒加载数据文件需要的锁
 }
 
 func (r *DataReader) Close() {
@@ -187,6 +189,8 @@ func NewDataReader(indexFilePaths []string, dataFilePaths []string) (*DataReader
 }
 
 func (r *DataReader) getReaderAt(fileId int) (io.ReaderAt, error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 	if r.fileCache[fileId] == nil {
 		filePath := r.dataFilePaths[fileId]
 		log.Println("尝试加载数据文件: ", filePath)
@@ -205,6 +209,7 @@ type DataRecord struct {
 }
 
 func (r *DataReader) Read(id uint32) (*DataRecord, error) {
+
 	fileId, seekInfo := r.indexFileSet.Get(id)
 	fileReader, err := r.getReaderAt(fileId)
 	if err != nil {

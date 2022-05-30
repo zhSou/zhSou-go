@@ -16,14 +16,15 @@ import (
 
 func InitConfig() *config.Config {
 	var conf = config.Config{
-		DataPaths:             []string{},
-		DataIndexPaths:        []string{},
-		CsvPaths:              []string{},
-		InvertedIndexFilePath: "D:\\inverted_index.inv",
-		DictPath:              "D:\\dict.dic",
-		StopWordPath:          "D:\\stop_words.txt",
-		ImportCsvCoroutines:   2,
-		PathLength:            4,
+		DataPaths:                   []string{},
+		DataIndexPaths:              []string{},
+		CsvPaths:                    []string{},
+		InvertedIndexFilePath:       "D:\\inverted_index.inv",
+		DictPath:                    "D:\\dict.dic",
+		StopWordPath:                "D:\\stop_words.txt",
+		ImportCsvCoroutines:         2,
+		MakeInvertedIndexCoroutines: 8,
+		PathLength:                  2,
 	}
 	for i := 0; i < conf.PathLength; i++ {
 		conf.DataPaths = append(conf.DataPaths, fmt.Sprintf("D:\\data\\wukong_100m_%d.dat", i))
@@ -59,28 +60,41 @@ func MakeInvertedIndexHandler() {
 	conf := global.Config
 	dataReader := global.DataReader
 	log.Println("总数据记录数：", dataReader.Len())
-	dic := dict.NewDict()
-	inv := invertedindex.NewInvertedIndex(dic)
-	// TODO 可以并行优化
-	for i := uint32(0); i < dataReader.Len(); i++ {
-		dataRecord, err := dataReader.Read(i)
-		if err != nil {
-			return
-		}
-		var words []string
-		for _, word := range global.Tokenizer.Cut(dataRecord.Text) {
-			if global.StopWordTable.IsStopWord(word) {
-				// 停用词过滤
-				continue
-			}
-			words = append(words, word)
-		}
-		inv.AddWords(words, int(i))
+	dic := dict.NewDict()                      // 字典
+	inv := invertedindex.NewInvertedIndex(dic) // 倒排索引
 
-		if i%10000 == 0 {
+	ch := make(chan uint32)
+	var wg sync.WaitGroup
+	for i := 0; i < conf.MakeInvertedIndexCoroutines; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for id := range ch {
+				dataRecord, err := dataReader.Read(id)
+				if err != nil {
+					return
+				}
+				var words []string
+				for _, word := range global.Tokenizer.Cut(dataRecord.Text) {
+					if global.StopWordTable.IsStopWord(word) {
+						// 停用词过滤
+						continue
+					}
+					words = append(words, word)
+				}
+				inv.AddWords(words, int(id))
+			}
+		}()
+	}
+
+	for i := uint32(0); i < dataReader.Len(); i++ {
+		ch <- i
+		if i%100000 == 0 {
 			log.Printf("当前建立倒排索引百分比 %.2f", float64(i)/float64(dataReader.Len()))
 		}
 	}
+	close(ch)
+	wg.Wait()
 	// 倒排索引升序排序
 	inv.Sort()
 
@@ -100,15 +114,21 @@ func MakeInvertedIndexHandler() {
 
 func QueryInvertedIndexHandler() {
 	conf := global.Config
-	log.Println("加载字典文件")
+	log.Println("加载字典文件", conf.DictPath)
 	dictFile, _ := os.Open(conf.DictPath)
 	defer dictFile.Close()
-	dic, _ := dict.Load(dictFile)
+	dic, err := dict.Load(dictFile)
+	if err != nil {
+		log.Fatalln("字典文件加载失败", err)
+	}
 
-	log.Println("加载倒排索引文件")
+	log.Println("加载倒排索引文件：", conf.InvertedIndexFilePath)
 	invFile, _ := os.Open(conf.InvertedIndexFilePath)
 	defer invFile.Close()
-	inv, _ := invertedindex.LoadInvertedIndexFromDisk(invFile, dic)
+	inv, err := invertedindex.LoadInvertedIndexFromDisk(invFile, dic)
+	if err != nil {
+		log.Fatalln("倒排索引文件加载失败", err)
+	}
 
 	fmt.Printf("请输入查找关键词：")
 	var keyword string
