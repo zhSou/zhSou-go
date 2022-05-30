@@ -118,36 +118,26 @@ func MakeInvertedIndexHandler() {
 }
 
 func QueryInvertedIndexHandler() {
-	conf := global.Config
-	log.Println("加载字典文件", conf.DictPath)
-	dictFile, _ := os.Open(conf.DictPath)
-	defer dictFile.Close()
-	dic, err := dict.Load(dictFile)
-	if err != nil {
-		log.Fatalln("字典文件加载失败", err)
-	}
+	inv := global.GetInvertedIndex()
+	for {
+		var keyword string
+		fmt.Printf("请输入查找关键词：")
+		_, _ = fmt.Scanln(&keyword)
 
-	log.Println("加载倒排索引文件：", conf.InvertedIndexFilePath)
-	invFile, _ := os.Open(conf.InvertedIndexFilePath)
-	defer invFile.Close()
-	inv, err := invertedindex.LoadInvertedIndexFromDisk(invFile, dic)
-	if err != nil {
-		log.Fatalln("倒排索引文件加载失败", err)
-	}
-
-	fmt.Printf("请输入查找关键词：")
-	var keyword string
-	_, _ = fmt.Scanln(&keyword)
-
-	is := inv.Get(keyword)
-
-	dataReader := global.GetDataReader()
-	for i, id := range is {
-		if i >= 10 {
+		if keyword == "exit" {
 			break
 		}
-		record, _ := dataReader.Read(uint32(id))
-		fmt.Println(i, id, record.Text)
+
+		is := inv.Get(keyword)
+
+		dataReader := global.GetDataReader()
+		for i, id := range is {
+			if i >= 10 {
+				break
+			}
+			record, _ := dataReader.Read(uint32(id))
+			fmt.Println(i, id, record.Text)
+		}
 	}
 }
 

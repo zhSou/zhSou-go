@@ -9,21 +9,21 @@ import (
 	"sync"
 )
 
-type invertedIndex struct {
+type InvertedIndex struct {
 	mutex sync.RWMutex
 	Data  map[int][]int
 	dict  *dict.Dict
 }
 
-func NewInvertedIndex(dict *dict.Dict) *invertedIndex {
-	return &invertedIndex{
+func NewInvertedIndex(dict *dict.Dict) *InvertedIndex {
+	return &InvertedIndex{
 		Data: make(map[int][]int),
 		dict: dict,
 	}
 }
 
-func LoadInvertedIndexFromDisk(r io.Reader, dict *dict.Dict) (*invertedIndex, error) {
-	ii := invertedIndex{}
+func LoadInvertedIndexFromDisk(r io.Reader, dict *dict.Dict) (*InvertedIndex, error) {
+	ii := InvertedIndex{}
 	err := gob.NewDecoder(r).Decode(&ii)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func LoadInvertedIndexFromDisk(r io.Reader, dict *dict.Dict) (*invertedIndex, er
 	return &ii, nil
 }
 
-func (i *invertedIndex) SaveToDisk(w io.Writer) error {
+func (i *InvertedIndex) SaveToDisk(w io.Writer) error {
 	err := gob.NewEncoder(w).Encode(*i)
 	if err != nil {
 		return err
@@ -40,14 +40,14 @@ func (i *invertedIndex) SaveToDisk(w io.Writer) error {
 	return nil
 }
 
-func (i *invertedIndex) Add(word string, id int) {
+func (i *InvertedIndex) Add(word string, id int) {
 	i.mutex.Lock()
 	defer i.mutex.Unlock()
 	wordId := i.dict.Put(word)
 	i.Data[wordId] = append(i.Data[wordId], id)
 }
 
-func (i *invertedIndex) AddWords(words []string, id int) {
+func (i *InvertedIndex) AddWords(words []string, id int) {
 	i.mutex.Lock()
 	defer i.mutex.Unlock()
 	for _, word := range set.Deduplication[string](words) {
@@ -56,14 +56,14 @@ func (i *invertedIndex) AddWords(words []string, id int) {
 	}
 }
 
-func (i *invertedIndex) Get(word string) []int {
+func (i *InvertedIndex) Get(word string) []int {
 	i.mutex.RLock()
 	defer i.mutex.RUnlock()
 	wordId := i.dict.Put(word)
 	return i.Data[wordId]
 }
 
-func (i *invertedIndex) Sort() {
+func (i *InvertedIndex) Sort() {
 	for _, ids := range i.Data {
 		sort.Ints(ids)
 	}
