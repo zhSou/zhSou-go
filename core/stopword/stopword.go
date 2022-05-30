@@ -11,10 +11,19 @@ type Table struct {
 	extraRule func(word string) bool
 }
 
+func NewTable() *Table {
+	return &Table{
+		stopWords: map[string]struct{}{},
+	}
+}
+
+func (t *Table) Add(word string) {
+	t.stopWords[word] = struct{}{}
+}
+
 // LoadStopWord 加载停用词表
-func LoadStopWord(filePath string) *Table {
+func (t *Table) LoadStopWord(filePath string) {
 	log.Println("加载停用词表")
-	stopWords := make(map[string]struct{})
 	// 加载停用词表
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -25,14 +34,11 @@ func LoadStopWord(filePath string) *Table {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		stopWords[line] = struct{}{}
+		t.Add(line)
 	}
 
 	if err := scanner.Err(); err != nil {
 		log.Fatalln("读取停用词表失败：", err)
-	}
-	return &Table{
-		stopWords: stopWords,
 	}
 }
 
