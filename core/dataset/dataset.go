@@ -154,7 +154,7 @@ func (r *DataReader) Close() {
 	}
 }
 
-func (r *DataReader) loadIndexFile() error {
+func (r *DataReader) LoadIndexFile() error {
 	log.Println("加载数据文件索引...")
 	if len(r.indexFilePaths) != len(r.dataFilePaths) {
 		return errors.New("索引文件集与数据文件集数量不一致")
@@ -211,7 +211,7 @@ func (r *DataReader) Read(id uint32) (*DataRecord, error) {
 
 	if r.indexFileSet == nil {
 		// 还没加载索引文件
-		err := r.loadIndexFile()
+		err := r.LoadIndexFile()
 		if err != nil {
 			return nil, err
 		}
@@ -235,7 +235,7 @@ func (r *DataReader) Read(id uint32) (*DataRecord, error) {
 func (r *DataReader) Len() uint32 {
 	if r.indexFileSet == nil {
 		// 还没加载索引文件
-		_ = r.loadIndexFile()
+		_ = r.LoadIndexFile()
 	}
 	idA := r.indexFileSet.idArray
 	return idA[len(idA)-1]

@@ -7,6 +7,7 @@ import (
 	"github.com/zhSou/zhSou-go/core/dict"
 	"github.com/zhSou/zhSou-go/core/invertedindex"
 	"github.com/zhSou/zhSou-go/global"
+	"github.com/zhSou/zhSou-go/util/algorithm/set"
 	"github.com/zhSou/zhSou-go/util/filesystem"
 	menu "github.com/zhSou/zhSou-go/util/menu"
 	"log"
@@ -117,27 +118,58 @@ func MakeInvertedIndexHandler() {
 	log.Println("词典文件已存盘：", conf.DictPath)
 }
 
-func QueryInvertedIndexHandler() {
+func Search(query string) []int {
+	dic := global.GetDict()
 	inv := global.GetInvertedIndex()
-	for {
-		var keyword string
-		fmt.Printf("请输入查找关键词：")
-		_, _ = fmt.Scanln(&keyword)
+	tkn := global.GetTokenizer()
 
-		if keyword == "exit" {
+	// 计算查询分词id(过滤所有不存在的分词)
+	var queryWordIds []int
+	var queryWordDocs [][]int
+	for _, kw := range tkn.Cut(query) {
+		if id := dic.Get(kw); id != -1 {
+			queryWordIds = append(queryWordIds, id)
+			queryWordDocs = append(queryWordDocs, inv.Get(kw))
+		}
+	}
+
+	// 计算所有查询分词的交集
+	var crossResult []int
+	for i := 0; i < len(queryWordDocs); i++ {
+		if i == 0 {
+			crossResult = queryWordDocs[0]
+			continue
+		}
+		crossResult = set.Cross(crossResult, queryWordDocs[i])
+	}
+	return crossResult
+}
+
+func QueryInvertedIndexHandler() {
+
+	for {
+		var keywords string
+		fmt.Printf("请输入查找关键词：")
+		_, _ = fmt.Scanln(&keywords)
+
+		if keywords == "exit" {
 			break
 		}
 
-		is := inv.Get(keyword)
+		var searchResult []int
+		startTime := time.Now()
+		searchResult = Search(keywords)
+		fmt.Printf("搜索结果：%d条 搜索用时：%.2fs\n", len(searchResult), time.Since(startTime).Seconds())
 
-		dataReader := global.GetDataReader()
-		for i, id := range is {
+		fmt.Println("以下预览前十条结果")
+		for i, id := range searchResult {
 			if i >= 10 {
 				break
 			}
-			record, _ := dataReader.Read(uint32(id))
+			record, _ := global.GetDataReader().Read(uint32(id))
 			fmt.Println(i, id, record.Text)
 		}
+		fmt.Printf("全部用时：%.2fs\n", time.Since(startTime).Seconds())
 	}
 }
 
@@ -153,12 +185,23 @@ func ClearHandler() {
 	os.Exit(0)
 }
 
+func Preload() {
+	global.GetDict()
+	global.GetStopWordTable()
+	global.GetInvertedIndex()
+	global.GetTokenizer()
+	err := global.GetDataReader().LoadIndexFile()
+	if err != nil {
+		log.Fatalln("数据索引文件加载失败：", err)
+	}
+}
 func main() {
 	global.InitGlobal(InitConfig())
 	mainMenu := menu.NewMenu("主菜单")
 	mainMenu.AddItem("csv数据集导入", ImportCsvHandler)
 	mainMenu.AddItem("构建倒排索引", MakeInvertedIndexHandler)
-	mainMenu.AddItem("查询倒排索引", QueryInvertedIndexHandler)
+	mainMenu.AddItem("查询", QueryInvertedIndexHandler)
+	mainMenu.AddItem("预加载", Preload)
 	mainMenu.AddItem("启动查询服务器", func() {})
 	mainMenu.AddItem("清理相关文件", ClearHandler)
 	mainMenu.AddExitItem("退出")
