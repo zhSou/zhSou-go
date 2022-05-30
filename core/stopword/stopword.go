@@ -8,6 +8,7 @@ import (
 
 type Table struct {
 	stopWords map[string]struct{}
+	extraRule func(word string) bool
 }
 
 // LoadStopWord 加载停用词表
@@ -35,7 +36,15 @@ func LoadStopWord(filePath string) *Table {
 	}
 }
 
+// BindExtraRule 绑定额外的停用词规则
+func (t *Table) BindExtraRule(extraRule func(word string) bool) {
+	t.extraRule = extraRule
+}
+
 func (t *Table) IsStopWord(word string) bool {
+	if t.extraRule != nil && t.extraRule(word) {
+		return true
+	}
 	_, ok := t.stopWords[word]
 	return ok
 }
