@@ -1,7 +1,9 @@
 package dataset
 
 import (
+	"encoding/csv"
 	"encoding/gob"
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/zhSou/zhSou-go/util/algorithm/binary"
 	"io"
@@ -20,6 +22,75 @@ type SeekInfo struct {
 type IndexFile struct {
 	ItemLength uint32
 	SeekInfo   []SeekInfo
+}
+
+func (f *IndexFile) SaveToFile(path string) error {
+	outputFile, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0777)
+	defer outputFile.Close()
+	enc := gob.NewEncoder(outputFile)
+	if err := enc.Encode(*f); err != nil {
+		log.Fatalf("Gob文件写入失败  path %s  err %v", path, err)
+		return err
+	}
+	log.Println("Gob文件成功输出：" + path)
+	return nil
+}
+
+func ConvCsvMakeIndexFile(inputCsvPath string, outputDataPath string, outputIndexPath string) {
+	file, err := os.Open(inputCsvPath)
+	if err != nil {
+		log.Printf("csv文件打开失败 path %s err %v", inputCsvPath, err)
+	}
+	defer file.Close()
+	reader := csv.NewReader(file)
+	log.Printf("打开成功 path %s ", inputCsvPath)
+
+	outputFile, err := os.OpenFile(outputDataPath, os.O_RDWR|os.O_CREATE, 0777)
+	defer outputFile.Close()
+
+	contentInfo := IndexFile{
+		ItemLength: 0,
+		SeekInfo:   []SeekInfo{},
+	}
+
+	// 字节偏移量
+	var offset uint32 = 0
+	var outputBytes []byte
+	for i := 0; ; i++ {
+		cols, err := reader.Read()
+		if err == io.EOF {
+			fmt.Println(i)
+			break
+		}
+		if err != nil {
+			log.Fatalln("csv文件读取失败：", err)
+		}
+		// 跳过csv表头
+		if i == 0 {
+			continue
+		}
+
+		bs1 := []byte(cols[0])
+		bs2 := []byte(cols[1])
+
+		urlLen := uint16(len(bs1))
+		textLen := uint16(len(bs2))
+		contentInfo.SeekInfo = append(
+			contentInfo.SeekInfo,
+			SeekInfo{
+				offset,
+				urlLen,
+				textLen,
+			})
+		outputBytes = append(outputBytes, bs1...)
+		outputBytes = append(outputBytes, bs2...)
+
+		offset += uint32(urlLen + textLen)
+		contentInfo.ItemLength++
+	}
+	outputFile.Write(outputBytes)
+	outputFile.Sync()
+	contentInfo.SaveToFile(outputIndexPath)
 }
 
 // IndexFileSet 数据集索引
