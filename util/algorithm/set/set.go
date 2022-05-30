@@ -1,5 +1,18 @@
 package set
 
+// Deduplication 删除切片中的重复元素(不保证顺序)
+func Deduplication[T comparable](s []T) []T {
+	mp := map[T]struct{}{}
+	for _, item := range s {
+		mp[item] = struct{}{}
+	}
+	var ret []T
+	for item, _ := range mp {
+		ret = append(ret, item)
+	}
+	return ret
+}
+
 /// 有序表的集合运算
 
 func Cross(s1, s2 []int) []int {
