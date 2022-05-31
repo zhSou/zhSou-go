@@ -15,8 +15,9 @@ func CutPage[T any](slice []T, pageId int, limitSize int) []T {
 	}
 	start, end := calcIndex(pageId, limitSize)
 
-	if start < 0 {
-		start = 0
+	// 起始地址越界
+	if start >= len(slice) {
+		return []T{}
 	}
 	if end >= len(slice) {
 		end = len(slice)
