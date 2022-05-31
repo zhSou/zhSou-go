@@ -1,6 +1,9 @@
 package lru
 
-import "container/list"
+import (
+	"container/list"
+	"sync"
+)
 
 type Key interface{}
 type Value interface{}
@@ -10,6 +13,7 @@ type kv struct {
 	value Value
 }
 type Cache struct {
+	mutex       sync.RWMutex
 	maxCapacity int
 	linkedList  *list.List
 	table       map[Key]*list.Element
@@ -25,6 +29,8 @@ func NewCache(maxCapacity int) *Cache {
 
 // Get / 获取缓存内容
 func (c *Cache) Get(key Key) (value Value, ok bool) {
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
 	if v, ok := c.table[key]; ok {
 		c.linkedList.MoveToFront(v)
 		return v.Value.(*kv).value, true
@@ -34,6 +40,8 @@ func (c *Cache) Get(key Key) (value Value, ok bool) {
 
 // Put / 放入一个kv
 func (c *Cache) Put(key Key, value Value) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	if v, ok := c.table[key]; ok {
 		c.linkedList.MoveToFront(v)
 		v.Value.(*kv).value = value
@@ -56,6 +64,8 @@ func (c *Cache) Put(key Key, value Value) {
 
 // Remove / 移除一个指定的key的kv
 func (c *Cache) Remove(key Key) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	if v, ok := c.table[key]; ok {
 		c.linkedList.Remove(v)
 		kv := v.Value.(*kv)
@@ -65,11 +75,15 @@ func (c *Cache) Remove(key Key) {
 
 // Len / 获取当前已缓存的数量
 func (c *Cache) Len() int {
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
 	return c.linkedList.Len()
 }
 
 // Clear / 清空缓存
 func (c *Cache) Clear() {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	c.linkedList = list.New()
 	c.table = make(map[Key]*list.Element)
 }
