@@ -48,13 +48,9 @@ func QueryHandler(c *gin.Context) {
 	_ = c.BindJSON(&qr)
 
 	ids := service.Search(qr.Query)
-	pageIds, err := cutpage.CutPage[int](ids, qr.Page, qr.Limit)
 
-	if err != nil {
-		return
-	}
-	var records []queryResponseRecord
-	for _, pageId := range pageIds {
+	records := make([]queryResponseRecord, 0)
+	for _, pageId := range cutpage.CutPage[int](ids, qr.Page, qr.Limit) {
 		dataRecord, err := global.GetDataReader().Read(uint32(pageId))
 		if err != nil {
 			return
