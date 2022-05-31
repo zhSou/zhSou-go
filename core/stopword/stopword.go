@@ -23,7 +23,7 @@ func (t *Table) Add(word string) {
 
 // LoadStopWord 加载停用词表
 func (t *Table) LoadStopWord(filePath string) {
-	log.Println("加载停用词表")
+	log.Println("加载停用词表", filePath)
 	// 加载停用词表
 	file, err := os.Open(filePath)
 	if err != nil {
