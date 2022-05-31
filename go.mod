@@ -3,13 +3,12 @@ module github.com/zhSou/zhSou-go
 go 1.18
 
 require (
+	github.com/flower-corp/rosedb v1.0.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.1
-	github.com/valyala/fastrand v1.1.0
 	github.com/yanyiwu/gojieba v1.1.2
-	github.com/flower-corp/rosedb v1.0.0
 )
 
 require (
