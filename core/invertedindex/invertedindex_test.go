@@ -45,7 +45,7 @@ func TestInvertedIndex_SaveToDisk(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	ifd, err := LoadInvertedIndexFromDisk(buf)
+	ifd, err := LoadInvertedIndexFromDisk(buf, dict.NewDict())
 	if err != nil {
 		return
 	}
