@@ -1,8 +1,9 @@
 package global
 
 import (
-	"github.com/zhSou/zhSou-go/core/stopword"
 	"sync"
+
+	"github.com/zhSou/zhSou-go/core/stopword"
 )
 
 var (

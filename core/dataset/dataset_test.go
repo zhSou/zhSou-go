@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var mockIndexFiles = []IndexFile{

@@ -1,8 +1,9 @@
 package binary
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFindFirstBigger(t *testing.T) {

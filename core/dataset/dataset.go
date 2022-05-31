@@ -3,13 +3,15 @@ package dataset
 import (
 	"encoding/csv"
 	"encoding/gob"
-	"github.com/pkg/errors"
-	"github.com/zhSou/zhSou-go/util/algorithm/binary"
-	"github.com/zhSou/zhSou-go/util/filesystem"
 	"io"
 	"log"
 	"os"
 	"sync"
+
+	"github.com/pkg/errors"
+
+	"github.com/zhSou/zhSou-go/util/algorithm/binary"
+	"github.com/zhSou/zhSou-go/util/filesystem"
 )
 
 // SeekInfo 存放某条记录的寻址信息

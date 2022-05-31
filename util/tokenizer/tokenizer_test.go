@@ -1,8 +1,9 @@
 package tokenizer
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewTokenizer(t *testing.T) {

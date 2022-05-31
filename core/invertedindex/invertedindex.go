@@ -2,11 +2,12 @@ package invertedindex
 
 import (
 	"encoding/gob"
-	"github.com/zhSou/zhSou-go/core/dict"
-	"github.com/zhSou/zhSou-go/util/algorithm/set"
 	"io"
 	"sort"
 	"sync"
+
+	"github.com/zhSou/zhSou-go/core/dict"
+	"github.com/zhSou/zhSou-go/util/algorithm/set"
 )
 
 type InvertedIndex struct {

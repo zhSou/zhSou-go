@@ -7,7 +7,7 @@ func Deduplication[T comparable](s []T) []T {
 		mp[item] = struct{}{}
 	}
 	var ret []T
-	for item, _ := range mp {
+	for item := range mp {
 		ret = append(ret, item)
 	}
 	return ret

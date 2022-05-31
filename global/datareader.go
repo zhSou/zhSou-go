@@ -1,9 +1,10 @@
 package global
 
 import (
-	"github.com/zhSou/zhSou-go/core/dataset"
 	"log"
 	"sync"
+
+	"github.com/zhSou/zhSou-go/core/dataset"
 )
 
 var (

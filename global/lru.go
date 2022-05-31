@@ -1,8 +1,9 @@
 package global
 
 import (
-	"github.com/zhSou/zhSou-go/util/lru"
 	"sync"
+
+	"github.com/zhSou/zhSou-go/util/lru"
 )
 
 var (

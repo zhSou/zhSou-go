@@ -1,10 +1,11 @@
 package global
 
 import (
-	"github.com/zhSou/zhSou-go/core/dict"
 	"log"
 	"os"
 	"sync"
+
+	"github.com/zhSou/zhSou-go/core/dict"
 )
 
 var (

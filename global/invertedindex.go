@@ -1,10 +1,11 @@
 package global
 
 import (
-	"github.com/zhSou/zhSou-go/core/invertedindex"
 	"log"
 	"os"
 	"sync"
+
+	"github.com/zhSou/zhSou-go/core/invertedindex"
 )
 
 var (

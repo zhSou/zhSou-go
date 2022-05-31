@@ -2,9 +2,11 @@ package invertedindex
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/assert"
-	"github.com/zhSou/zhSou-go/core/dict"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/zhSou/zhSou-go/core/dict"
 )
 
 func TestNewInvertedIndex(t *testing.T) {

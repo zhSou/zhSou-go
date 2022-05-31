@@ -1,8 +1,9 @@
 package cutpage
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCutPage(t *testing.T) {

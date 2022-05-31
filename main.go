@@ -2,6 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"sync"
+	"time"
+
 	"github.com/zhSou/zhSou-go/api"
 	"github.com/zhSou/zhSou-go/core/config"
 	"github.com/zhSou/zhSou-go/core/dataset"
@@ -11,10 +16,6 @@ import (
 	"github.com/zhSou/zhSou-go/service"
 	"github.com/zhSou/zhSou-go/util/filesystem"
 	menu "github.com/zhSou/zhSou-go/util/menu"
-	"log"
-	"os"
-	"sync"
-	"time"
 )
 
 func InitConfig() *config.Config {
