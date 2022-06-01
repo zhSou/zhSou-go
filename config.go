@@ -6,7 +6,8 @@ import (
 	"github.com/zhSou/zhSou-go/core/config"
 )
 
-const pathPrefix = "C:\\Users\\zzq\\Desktop\\新建文件夹 (2)"
+//const pathPrefix = "C:\\Users\\zzq\\Desktop\\新建文件夹 (2)"
+const pathPrefix = "D:"
 
 func InitConfig() *config.Config {
 	var conf = config.Config{

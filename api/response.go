@@ -1,8 +1,8 @@
 package api
 
 const (
-	Success      = 0
-	UnknownError = 1
+	Success = iota
+	UnknownError
 )
 
 type Response struct {
