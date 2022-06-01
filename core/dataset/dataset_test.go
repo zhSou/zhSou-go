@@ -3,7 +3,6 @@ package dataset
 import (
 	"bytes"
 	"encoding/gob"
-	"fmt"
 	"io"
 	"testing"
 
@@ -91,32 +90,4 @@ func TestIndexFileSet_Get(t *testing.T) {
 		assert.Equal(t, 2, fileId)
 		assert.Equal(t, mockIndexFiles[2].SeekInfo[2], *indexItem)
 	}
-}
-
-func TestNewDataReader(t *testing.T) {
-	var indexFilePaths, dataFilePaths []string
-	for i := 0; i < 256; i++ {
-		indexFilePaths = append(indexFilePaths, fmt.Sprintf("D:\\index\\wukong_100m_%d.gob", i))
-		dataFilePaths = append(dataFilePaths, fmt.Sprintf("D:\\after\\wukong_100m_%d.dat", i))
-	}
-	dataReader, err := NewDataReader(indexFilePaths, dataFilePaths)
-	fmt.Println(dataReader.indexFileSet.idArray)
-	if err != nil {
-		panic(err)
-	}
-	// 按1kw为间隔遍历一亿条数据
-	for i := 0; i <= 100000000; i += 10000000 {
-		dataRecord, err := dataReader.Read(uint32(i))
-		if err != nil {
-			panic(fmt.Sprintf("读取错误：%v", err))
-		}
-		fmt.Println(i, dataRecord)
-	}
-	dr, _ := dataReader.Read(0)
-	assert.Equal(t, "今年能跑赢96不?备战坦克两项俄军开始选拔参赛队员", dr.Text)
-	dr, _ = dataReader.Read(100000000)
-	assert.Equal(t, "光大银行福州分行成立二十周年发展纪实", dr.Text)
-
-	// 总数据量
-	assert.Equal(t, uint32(101483885), dataReader.Len())
 }
