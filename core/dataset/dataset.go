@@ -45,12 +45,17 @@ func ConvCsvMakeIndexFile(inputCsvPath string, outputDataPath string, outputInde
 	file, err := os.Open(inputCsvPath)
 	if err != nil {
 		log.Printf("csv文件打开失败 path %s err %v", inputCsvPath, err)
+		return
 	}
 	defer file.Close()
 	reader := csv.NewReader(file)
 	log.Println("csv文件打开成功", inputCsvPath)
 
 	outputFile, err := os.OpenFile(outputDataPath, os.O_RDWR|os.O_CREATE, 0777)
+	if err != nil {
+		log.Printf("文件打开失败 path %s err %v", outputDataPath, err)
+		return
+	}
 	defer outputFile.Close()
 
 	contentInfo := IndexFile{
