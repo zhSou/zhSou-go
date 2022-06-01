@@ -15,51 +15,8 @@ import (
 	"github.com/zhSou/zhSou-go/global"
 	"github.com/zhSou/zhSou-go/service"
 	"github.com/zhSou/zhSou-go/util/filesystem"
-	menu "github.com/zhSou/zhSou-go/util/menu"
+	"github.com/zhSou/zhSou-go/util/menu"
 )
-
-func InitConfig() *config.Config {
-	var conf = config.Config{
-		DataPaths:                   []string{},
-		DataIndexPaths:              []string{},
-		CsvPaths:                    []string{},
-		InvertedIndexFilePath:       "D:\\inverted_index.inv",
-		DictPath:                    "D:\\dict.dic",
-		StopWordPath:                "D:\\stop_words.txt",
-		ImportCsvCoroutines:         4,
-		MakeInvertedIndexCoroutines: 8,
-		PathLength:                  256,
-		SearchLruMaxCapacity:        20,
-	}
-	for i := 0; i < conf.PathLength; i++ {
-		conf.DataPaths = append(conf.DataPaths, fmt.Sprintf("D:\\data\\wukong_100m_%d.dat", i))
-		conf.DataIndexPaths = append(conf.DataIndexPaths, fmt.Sprintf("D:\\index\\wukong_100m_%d.idx", i))
-		conf.CsvPaths = append(conf.CsvPaths, fmt.Sprintf("D:\\input\\wukong_100m_%d.csv", i))
-	}
-	return &conf
-}
-
-// InitConfig1 测试时候可以用这个轻量级配置文件，只加载一个数据集
-func InitConfig1() *config.Config {
-	var conf = config.Config{
-		DataPaths:                   []string{},
-		DataIndexPaths:              []string{},
-		CsvPaths:                    []string{},
-		InvertedIndexFilePath:       "D:\\light\\inverted_index.inv",
-		DictPath:                    "D:\\light\\dict.dic",
-		StopWordPath:                "D:\\stop_words.txt",
-		ImportCsvCoroutines:         4,
-		MakeInvertedIndexCoroutines: 8,
-		PathLength:                  1,
-		SearchLruMaxCapacity:        20,
-	}
-	for i := 0; i < conf.PathLength; i++ {
-		conf.DataPaths = append(conf.DataPaths, fmt.Sprintf("D:\\light\\data\\wukong_100m_%d.dat", i))
-		conf.DataIndexPaths = append(conf.DataIndexPaths, fmt.Sprintf("D:\\light\\index\\wukong_100m_%d.idx", i))
-		conf.CsvPaths = append(conf.CsvPaths, fmt.Sprintf("D:\\input\\wukong_100m_%d.csv", i))
-	}
-	return &conf
-}
 
 func ImportCsvHandler() {
 	conf := global.Config
@@ -200,7 +157,7 @@ func main() {
 		configMenu.StopForNextLoop()
 	})
 	configMenu.AddItem("30w数据量", func() {
-		conf = InitConfig1()
+		conf = InitConfigLight()
 		configMenu.StopForNextLoop()
 	})
 	configMenu.Loop()
