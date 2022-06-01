@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/zhSou/zhSou-go/api"
+	config2 "github.com/zhSou/zhSou-go/config"
 	"github.com/zhSou/zhSou-go/core/config"
 	"github.com/zhSou/zhSou-go/core/dataset"
 	"github.com/zhSou/zhSou-go/core/dict"
@@ -153,11 +154,11 @@ func main() {
 	var conf *config.Config
 	configMenu := menu.NewMenu("请选择配置文件")
 	configMenu.AddItem("1亿数据量", func() {
-		conf = InitConfig()
+		conf = config2.InitConfig()
 		configMenu.StopForNextLoop()
 	})
 	configMenu.AddItem("30w数据量", func() {
-		conf = InitConfigLight()
+		conf = config2.InitConfigLight()
 		configMenu.StopForNextLoop()
 	})
 	configMenu.Loop()
