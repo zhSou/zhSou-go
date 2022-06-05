@@ -15,6 +15,13 @@ func Deduplication[T comparable](s []T) []T {
 
 /// 有序表的集合运算
 
+//
+// Cross
+//  @Description: 求有序表的交集
+//  @param s1
+//  @param s2
+//  @return []int
+//
 func Cross(s1, s2 []int) []int {
 	var res []int
 	res = []int{}
@@ -33,6 +40,13 @@ func Cross(s1, s2 []int) []int {
 	return res
 }
 
+//
+// Sum
+//  @Description: 求有序表的并集
+//  @param s1
+//  @param s2
+//  @return []int
+//
 func Sum(s1, s2 []int) []int {
 	var res []int
 	res = []int{}
@@ -61,6 +75,13 @@ func Sum(s1, s2 []int) []int {
 	return res
 }
 
+//
+// Exclude
+//  @Description: 求补集
+//  @param source
+//  @param exclude
+//  @return []int
+//
 func Exclude(source, exclude []int) []int {
 	var res []int
 	res = []int{}
