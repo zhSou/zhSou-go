@@ -9,30 +9,117 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var (
+	testCases = []struct {
+		source []int // 输入的有序的切片
+		target int   // 要找的目标值
+		output int   // 期待返回的值
+	}{
+		// 等价类测试法
+		// 有效等价类 ，输入的切片是升序的
+		{
+			source: []int{9, 10, 20, 30, 40, 50, 60, 70},
+			target: 20,
+			output: 3,
+		},
+
+		// 目标值中没有
+		{
+			source: []int{9, 10, 20, 30, 40, 50, 60, 70},
+			target: 71,
+			output: -1,
+		},
+		// 无效等价类
+		// 降序的
+		{
+			source: []int{70, 60, 50, 40, 30, 20, 10, 9},
+			target: 20,
+			output: 0,
+		},
+		// 乱序的
+		{
+			source: []int{9, 291, 2192, 10, 92912, 993, 99934, 29},
+			target: 200,
+			output: 4,
+		},
+		// 空数组
+		{
+			source: nil,
+			target: 10,
+			output: -1,
+		},
+
+		// 边界值
+		{
+			source: []int{9, 11, 13, 16, 17, 17, 19, 19, 20, 20},
+			target: 8,
+			output: 0,
+		},
+		{
+			source: []int{9, 11, 13, 16, 17, 17, 19, 19, 20, 20},
+			target: 17,
+			output: 6,
+		},
+		{
+			source: []int{9, 11, 13, 16, 17, 17, 19, 19, 20, 20},
+			target: 19,
+			output: 8,
+		},
+		{
+			source: []int{9, 11, 13, 16, 17, 17, 19, 19, 20, 20},
+			target: 20,
+			output: -1,
+		},
+
+		// 基本路径测试
+		// 直接结束
+		{
+			source: []int{},
+			target: 1,
+			output: -1,
+		},
+		// 不会经过循环
+		{
+			source: []int{1},
+			target: 1,
+			output: -1,
+		},
+		{
+			source: []int{2},
+			target: 1,
+			output: 0,
+		},
+		{
+			source: []int{1},
+			target: 2,
+			output: -1,
+		},
+		// 经过循环
+		{
+			source: []int{1, 2, 3},
+			target: 1,
+			output: 1,
+		},
+		{
+			source: []int{1, 2, 3},
+			target: 2,
+			output: 2,
+		},
+
+		{
+			source: []int{1, 2, 3},
+			target: 3,
+			output: -1,
+		},
+	}
+)
+
 func TestFindFirstBigger(t *testing.T) {
-	// todo 按照软件测试的要求进行设计测试用例
-	s1 := []int{1, 6, 21, 90, 100}
-	as := &SliceAccessible[int]{s1}
-	// 正常情况
-	assert.Equal(t, 0, FindFirstBigger[int](as, -1))
-	assert.Equal(t, 0, FindFirstBigger[int](as, 0))
-
-	assert.Equal(t, 1, FindFirstBigger[int](as, 1))
-	assert.Equal(t, 1, FindFirstBigger[int](as, 4))
-	assert.Equal(t, 3, FindFirstBigger[int](as, 21))
-
-	assert.Equal(t, 4, FindFirstBigger[int](as, 91))
-	// 比100,104大的数找不到，返回-1
-	assert.Equal(t, -1, FindFirstBigger[int](as, 100))
-	assert.Equal(t, -1, FindFirstBigger[int](as, 104))
-
-	// 不存在任何数字，故查找到的索引值恒为-1
-	assert.Equal(t, -1, FindFirstBigger[int](NewSliceAccessible([]int{}), 1))
-	assert.Equal(t, -1, FindFirstBigger[int](NewSliceAccessible([]int{}), 4))
-
-	s2 := []uint32{1, 3, 6}
-	as2 := &SliceAccessible[uint32]{s2}
-	assert.Equal(t, 1, FindFirstBigger[uint32](as2, 1))
+	for _, testCase := range testCases {
+		as := &SliceAccessible[int]{testCase.source}
+		get := FindFirstBigger[int](as, testCase.target)
+		assert.Equal(t, testCase.output, get, testCase)
+	}
 }
 
 //
