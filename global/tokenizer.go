@@ -1,9 +1,8 @@
 package global
 
 import (
+	"github.com/zhSou/zhSou-go/core/tokenizer"
 	"sync"
-
-	"github.com/zhSou/zhSou-go/util/tokenizer"
 )
 
 var (
