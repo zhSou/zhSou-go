@@ -137,8 +137,8 @@ func generateNums(size int) []int {
 }
 
 func benchmarkFindFirstBigger(n int, b *testing.B) {
+	nums := NewSliceAccessible[int](generateNums(n))
 	for i := 0; i < b.N; i++ {
-		nums := NewSliceAccessible[int](generateNums(n))
 		targetNum := nums.Get(rand.Intn(n))
 		_ = FindFirstBigger[int](nums, targetNum)
 	}
@@ -169,38 +169,15 @@ func BenchmarkFindFirstBigger1000000(b *testing.B) {
 	benchmarkFindFirstBigger(1000000, b)
 }
 
-// 执行了 523077次 每次11287ns
-
-// $ go test -bench="FindFirstBigger"  -benchtime=5s .
-//goos: windows
-//goarch: amd64
-//pkg: github.com/zhSou/zhSou-go/util/algorithm/binary
-//cpu: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
-//BenchmarkFindFirstBigger-12       523077             11287 ns/op
-//PASS
-//ok      github.com/zhSou/zhSou-go/util/algorithm/binary 6.071s
-
-// $ go test -bench="FindFirstBigger"  -benchtime=5s -count=3 .
-//goos: windows
-//goarch: amd64
-//pkg: github.com/zhSou/zhSou-go/util/algorithm/binary
-//cpu: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
-//BenchmarkFindFirstBigger-12       535316             11557 ns/op
-//BenchmarkFindFirstBigger-12       509092             11602 ns/op
-//BenchmarkFindFirstBigger-12       528079             11611 ns/op
-//PASS
-//ok      github.com/zhSou/zhSou-go/util/algorithm/binary 18.623s
-
-// 时间复杂度测试
 //$ go test -bench .
 //goos: windows
 //goarch: amd64
 //pkg: github.com/zhSou/zhSou-go/util/algorithm/binary
 //cpu: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
-//BenchmarkFindFirstBigger-12               103789             11449 ns/op
-//BenchmarkFindFirstBigger100-12             92036             12965 ns/op
-//BenchmarkFindFirstBigger10000-12            1022           1181705 ns/op
-//BenchmarkFindFirstBigger100000-12             79          14308522 ns/op
-//BenchmarkFindFirstBigger1000000-12             7         166170957 ns/op
+//BenchmarkFindFirstBigger-12                91303             12770 ns/op
+//BenchmarkFindFirstBigger100-12          20440143                61.43 ns/op
+//BenchmarkFindFirstBigger10000-12         9601911               113.7 ns/op
+//BenchmarkFindFirstBigger100000-12        7728529               157.6 ns/op
+//BenchmarkFindFirstBigger1000000-12       3631664               281.2 ns/op
 //PASS
-//ok      github.com/zhSou/zhSou-go/util/algorithm/binary 7.481s
+//ok      github.com/zhSou/zhSou-go/util/algorithm/binary 9.662s
