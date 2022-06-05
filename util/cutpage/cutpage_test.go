@@ -3,34 +3,122 @@ package cutpage
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+var (
+	testCases = []struct {
+		source   []int
+		pageId   int
+		pageSize int
+		res      []int
+	}{
+		// 按长度为2取第1页，第2页
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   1,
+			pageSize: 2,
+			res:      []int{5, 2},
+		},
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   2,
+			pageSize: 2,
+			res:      []int{8, 3},
+		},
+		// 按长度为3取第1,2,3页
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   1,
+			pageSize: 3,
+			res:      []int{5, 2, 8},
+		},
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   2,
+			pageSize: 3,
+			res:      []int{3, 1, 2},
+		},
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   3,
+			pageSize: 3,
+			res:      []int{},
+		},
+		// 按长度为4取第1,2,3页
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   1,
+			pageSize: 4,
+			res:      []int{5, 2, 8, 3},
+		},
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   2,
+			pageSize: 4,
+			res:      []int{1, 2},
+		},
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   3,
+			pageSize: 4,
+			res:      []int{},
+		},
+		// 按长度为0取第-1页，第0页，第1页
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   -1,
+			pageSize: 0,
+			res:      []int{},
+		},
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   0,
+			pageSize: 0,
+			res:      []int{},
+		},
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   1,
+			pageSize: 0,
+			res:      []int{},
+		},
+		// 按长度为-1取第-1页，第0页，第1页
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   -1,
+			pageSize: -1,
+			res:      []int{},
+		},
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   -1,
+			pageSize: 0,
+			res:      []int{},
+		},
+		{
+			source:   []int{5, 2, 8, 3, 1, 2},
+			pageId:   -1,
+			pageSize: 1,
+			res:      []int{},
+		},
+		// 空数据集
+		{
+			source:   []int{},
+			pageId:   1,
+			pageSize: 1,
+			res:      []int{},
+		}, {
+			source:   []int{},
+			pageId:   22,
+			pageSize: 1,
+			res:      []int{},
+		},
+	}
 )
 
 func TestCutPage(t *testing.T) {
-	s1 := []int{5, 2, 8, 3, 1, 2}
-	// 按长度为2取第1页，第2页
-	assert.Equal(t, []int{5, 2}, CutPage[int](s1, 1, 2))
-	assert.Equal(t, []int{8, 3}, CutPage[int](s1, 2, 2))
-	// 按长度为3取第1,2,3页
-	assert.Equal(t, []int{5, 2, 8}, CutPage[int](s1, 1, 3))
-	assert.Equal(t, []int{3, 1, 2}, CutPage[int](s1, 2, 3))
-	assert.Equal(t, []int{}, CutPage[int](s1, 3, 3))
-	// 按长度为4取第1,2,3页
-	assert.Equal(t, []int{5, 2, 8, 3}, CutPage[int](s1, 1, 4))
-	assert.Equal(t, []int{1, 2}, CutPage[int](s1, 2, 4))
-	assert.Equal(t, []int{}, CutPage[int](s1, 3, 4))
-
-	// 按长度为0取第-1页，第0页，第1页
-	assert.Equal(t, []int{}, CutPage[int](s1, -1, 0))
-	assert.Equal(t, []int{}, CutPage[int](s1, 0, 0))
-	assert.Equal(t, []int{}, CutPage[int](s1, 1, 0))
-	// 按长度为-1取第-1页，第0页，第1页
-	assert.Equal(t, []int{}, CutPage[int](s1, -1, -1))
-	assert.Equal(t, []int{}, CutPage[int](s1, 0, -1))
-	assert.Equal(t, []int{}, CutPage[int](s1, 1, -1))
-
-	// 空数据集
-	s2 := make([]int, 0)
-	assert.Equal(t, []int{}, CutPage[int](s2, 1, 2))
-	assert.Equal(t, []int{}, CutPage[int](s2, 2, 1))
+	for _, testCase := range testCases {
+		require.Equal(t, testCase.res, CutPage[int](testCase.source, testCase.pageId, testCase.pageSize), testCase)
+	}
 }
