@@ -6,6 +6,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var (
+	testCases = []struct {
+		input  string
+		output []string
+	}{
+		{
+			input:  "执行测试用例",
+			output: []string{"执行", "测试", "试用", "测试用例"},
+		},
+		{
+			input:  "",
+			output: nil,
+		},
+	}
+)
+
 func TestNewTokenizer(t *testing.T) {
 	tokenizer := NewTokenizer()
 	assert.NotNil(t, tokenizer)
@@ -13,8 +29,8 @@ func TestNewTokenizer(t *testing.T) {
 
 func TestJiebaTokenizer_Cut(t *testing.T) {
 	tokenizer := NewTokenizer()
-	cutResult := tokenizer.Cut("执行测试用例")
-	assert.Contains(t, cutResult, "执行")
-	assert.Contains(t, cutResult, "测试")
-	assert.Contains(t, cutResult, "测试用例")
+	for _, testCase := range testCases {
+		cutResult := tokenizer.Cut(testCase.input)
+		assert.Equal(t, testCase.output, cutResult)
+	}
 }
