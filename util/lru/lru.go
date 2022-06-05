@@ -29,8 +29,8 @@ func NewCache(maxCapacity int) *Cache {
 
 // Get / 获取缓存内容
 func (c *Cache) Get(key Key) (value Value, ok bool) {
-	c.mutex.RLock()
-	defer c.mutex.RUnlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	if v, ok := c.table[key]; ok {
 		c.linkedList.MoveToFront(v)
 		return v.Value.(*kv).value, true
