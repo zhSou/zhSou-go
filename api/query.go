@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/zhSou/zhSou-go/util/highlight"
 	"math"
 	"time"
 
@@ -19,9 +20,10 @@ type highLight struct {
 
 /// 查询请求
 type queryRequest struct {
-	Query string `json:"query"`
-	Page  int    `json:"page"`
-	Limit int    `json:"limit"`
+	Query     string    `json:"query"`
+	Page      int       `json:"page"`
+	Limit     int       `json:"limit"`
+	HighLight highLight `json:"highLight"`
 }
 
 type document struct {
@@ -49,7 +51,8 @@ func QueryHandler(c *gin.Context) {
 	var qr queryRequest
 	_ = c.BindJSON(&qr)
 
-	ids := service.Search(qr.Query)
+	ret := service.Search(qr.Query)
+	ids := ret.DocIds
 
 	records := make([]queryResponseRecord, 0)
 	for _, pageId := range cutpage.CutPage[int](ids, qr.Page, qr.Limit) {
@@ -59,7 +62,7 @@ func QueryHandler(c *gin.Context) {
 		}
 		records = append(records, queryResponseRecord{
 			Id:   pageId,
-			Text: dataRecord.Text,
+			Text: highlight.HighLight(dataRecord.Text, ret.Words, qr.HighLight.PreTag, qr.HighLight.PostTag),
 			Document: document{
 				Url:  dataRecord.Url,
 				Text: dataRecord.Text,

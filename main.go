@@ -113,7 +113,7 @@ func QueryInvertedIndexHandler() {
 
 		var searchResult []int
 		startTime := time.Now()
-		searchResult = service.Search(keywords)
+		searchResult = service.Search(keywords).DocIds
 		fmt.Printf("搜索结果：%d条 搜索用时：%.2fs\n", len(searchResult), time.Since(startTime).Seconds())
 
 		fmt.Println("以下预览前十条结果")

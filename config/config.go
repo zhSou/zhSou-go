@@ -7,7 +7,7 @@ import (
 )
 
 //const pathPrefix = "C:\\Users\\zzq\\Desktop\\新建文件夹 (2)"
-const pathPrefix = "D:"
+const pathPrefix = "C:\\Users\\zzq\\Desktop\\新建文件夹"
 
 func InitConfig() *config.Config {
 	var conf = config.Config{

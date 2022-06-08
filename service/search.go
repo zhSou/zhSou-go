@@ -5,20 +5,27 @@ import (
 	"github.com/zhSou/zhSou-go/util/algorithm/set"
 )
 
-func Search(query string) []int {
+type searchResult struct {
+	Words  []string
+	DocIds []int
+}
+
+func Search(query string) *searchResult {
 	dic := global.GetDict()
 	inv := global.GetInvertedIndex()
 	tkn := global.GetTokenizer()
 	lru := global.GetSearchLru()
 	if val, ok := lru.Get(query); ok {
-		return val.([]int)
+		return val.(*searchResult)
 	}
 
 	// 计算查询分词id(过滤所有不存在的分词)
 	var queryWordIds []int
+	var queryWords []string
 	var queryWordDocs [][]int
 	for _, kw := range tkn.Cut(query) {
 		if id := dic.Get(kw); id != -1 {
+			queryWords = append(queryWords, kw)
 			queryWordIds = append(queryWordIds, id)
 			queryWordDocs = append(queryWordDocs, inv.Get(kw))
 		}
@@ -33,6 +40,10 @@ func Search(query string) []int {
 		}
 		crossResult = set.Cross(crossResult, queryWordDocs[i])
 	}
-	lru.Put(query, crossResult)
-	return crossResult
+	ret := &searchResult{
+		Words:  queryWords,
+		DocIds: crossResult,
+	}
+	lru.Put(query, ret)
+	return ret
 }
