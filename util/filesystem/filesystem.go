@@ -19,7 +19,7 @@ func Exists(path string) (bool, error) {
 
 func MakeDir(filepath string) error {
 	i := strings.LastIndexFunc(filepath, func(r rune) bool {
-		return r == '\\'
+		return r == '/'
 	})
 	dirPath := filepath[:i]
 	exist, err := Exists(dirPath)
