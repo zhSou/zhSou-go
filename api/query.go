@@ -56,7 +56,7 @@ func QueryHandler(c *gin.Context) {
 		c.JSON(200, BuildErrorResponse(RequestFormatError, "请求格式有误"))
 	}
 
-	ret := service.Search(qr.Query)
+	ret := service.SearchWithFilter(qr.Query, qr.FilterWords)
 	ids := ret.DocIds
 
 	records := make([]queryResponseRecord, 0)

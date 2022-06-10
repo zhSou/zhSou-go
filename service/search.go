@@ -49,3 +49,18 @@ func Search(query string) *searchResult {
 	lru.Put(query, ret)
 	return ret
 }
+
+func SearchWithFilter(query string, filterWords []string) *searchResult {
+
+	queryResult := Search(query)
+	srcIds := queryResult.DocIds
+	for _, filterWord := range filterWords {
+		excludeIds := Search(filterWord).DocIds
+		srcIds = set.Exclude(srcIds, excludeIds)
+	}
+
+	return &searchResult{
+		Words:  queryResult.Words,
+		DocIds: srcIds,
+	}
+}
