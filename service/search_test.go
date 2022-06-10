@@ -56,7 +56,7 @@ func BenchmarkSearchLight(b *testing.B) {
 	queries := generatorSearchQuery()
 	n := len(queries)
 	for i := 0; i < b.N; i++ {
-		Search(queries[rand.Intn(n)], []string{})
+		Search(queries[rand.Intn(n)])
 	}
 }
 
@@ -74,6 +74,6 @@ func BenchmarkSearchAll(b *testing.B) {
 	queries := generatorSearchQuery()
 	n := len(queries)
 	for i := 0; i < b.N; i++ {
-		Search(queries[rand.Intn(n)], []string{})
+		Search(queries[rand.Intn(n)])
 	}
 }
