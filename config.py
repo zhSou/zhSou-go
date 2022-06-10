@@ -19,7 +19,7 @@ def get_config():
         'searchLruMaxCapacity': 20,
         'showMenu': True,
         'listenIp': '0.0.0.0',
-        'listenPort': '8080',
+        'listenPort': 8080,
     }
 
 
@@ -38,7 +38,7 @@ def get_light_config():
         'searchLruMaxCapacity': 20,
         'showMenu': False,
         'listenIp': '0.0.0.0',
-        'listenPort': '8080',
+        'listenPort': 8080,
     }
 
 

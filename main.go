@@ -157,7 +157,7 @@ func main() {
 		log.Fatalln(err)
 	}
 	var conf config.Config
-	if json.Unmarshal(configJson, &conf) != nil {
+	if err := json.Unmarshal(configJson, &conf); err != nil {
 		log.Fatalln(err)
 	}
 	global.InitGlobal(&conf)
