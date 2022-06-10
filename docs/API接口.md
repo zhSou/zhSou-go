@@ -38,6 +38,8 @@ POST /query
 | totalPage | int      | 总页数       |
 | page      | int      | 当前页       |
 | records   | Record[] | 当前页的所有记录项 |
+
+
 对于Record格式如下
 
 | 字段       | 类型                         | 描述                   |
@@ -73,7 +75,7 @@ POST /query
 					"text": "游戏本体关于宇宙竞技场"
 				}
 			},
-          ...
+            ...
         ]
     }
 }
