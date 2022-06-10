@@ -1,5 +1,6 @@
 import json
 
+# path_prefix = r'/home/ubuntu/search/data'
 path_prefix = r'C:/Users/zzq/Desktop/新建文件夹'
 
 
@@ -17,6 +18,8 @@ def get_config():
         'makeInvertedIndexCoroutines': 8,
         'searchLruMaxCapacity': 20,
         'showMenu': True,
+        'listenIp': '0.0.0.0',
+        'listenPort': '8080',
     }
 
 
@@ -34,6 +37,8 @@ def get_light_config():
         'makeInvertedIndexCoroutines': 8,
         'searchLruMaxCapacity': 20,
         'showMenu': False,
+        'listenIp': '0.0.0.0',
+        'listenPort': '8080',
     }
 
 
