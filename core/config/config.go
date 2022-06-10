@@ -12,4 +12,6 @@ type Config struct {
 	MakeInvertedIndexCoroutines int      `json:"makeInvertedIndexCoroutines"` // 构造倒排索引的并发数
 	SearchLruMaxCapacity        int      `json:"searchLruMaxCapacity"`        // 最外层搜索的lru缓存大小
 	ShowMenu                    bool     `json:"showMenu"`                    // 是否显示主菜单，若不显示，则直接加载查询
+	ListenIp                    string   `json:"listenIp"`                    // 监听ip
+	ListenPort                  uint16   `json:"listenPort"`                  // 监听端口号
 }
