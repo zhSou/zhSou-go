@@ -1,14 +1,16 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/zhSou/zhSou-go/api"
+	"github.com/zhSou/zhSou-go/util/menu"
+	"io/ioutil"
 	"log"
 	"os"
 	"sync"
 	"time"
 
-	"github.com/zhSou/zhSou-go/api"
-	config2 "github.com/zhSou/zhSou-go/config"
 	"github.com/zhSou/zhSou-go/core/config"
 	"github.com/zhSou/zhSou-go/core/dataset"
 	"github.com/zhSou/zhSou-go/core/dict"
@@ -16,7 +18,6 @@ import (
 	"github.com/zhSou/zhSou-go/global"
 	"github.com/zhSou/zhSou-go/service"
 	"github.com/zhSou/zhSou-go/util/filesystem"
-	"github.com/zhSou/zhSou-go/util/menu"
 )
 
 func ImportCsvHandler() {
@@ -151,26 +152,27 @@ func Preload() {
 	}
 }
 func main() {
-	var conf *config.Config
-	configMenu := menu.NewMenu("请选择配置文件")
-	configMenu.AddItem("1亿数据量", func() {
-		conf = config2.InitConfig()
-		configMenu.StopForNextLoop()
-	})
-	configMenu.AddItem("30w数据量", func() {
-		conf = config2.InitConfigLight()
-		configMenu.StopForNextLoop()
-	})
-	configMenu.Loop()
-	global.InitGlobal(conf)
-
-	mainMenu := menu.NewMenu("主菜单")
-	mainMenu.AddItem("csv数据集导入", ImportCsvHandler)
-	mainMenu.AddItem("构建倒排索引", MakeInvertedIndexHandler)
-	mainMenu.AddItem("查询", QueryInvertedIndexHandler)
-	mainMenu.AddItem("预加载", Preload)
-	mainMenu.AddItem("启动查询服务器", api.StartServer)
-	mainMenu.AddItem("清理相关文件", ClearHandler)
-	mainMenu.AddExitItem("退出")
-	mainMenu.Loop()
+	configJson, err := ioutil.ReadFile("config.json")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	var conf config.Config
+	if json.Unmarshal(configJson, &conf) != nil {
+		log.Fatalln(err)
+	}
+	global.InitGlobal(&conf)
+	if conf.ShowMenu {
+		mainMenu := menu.NewMenu("主菜单")
+		mainMenu.AddItem("csv数据集导入", ImportCsvHandler)
+		mainMenu.AddItem("构建倒排索引", MakeInvertedIndexHandler)
+		mainMenu.AddItem("查询", QueryInvertedIndexHandler)
+		mainMenu.AddItem("预加载", Preload)
+		mainMenu.AddItem("启动查询服务器", api.StartServer)
+		mainMenu.AddItem("清理相关文件", ClearHandler)
+		mainMenu.AddExitItem("退出")
+		mainMenu.Loop()
+	} else {
+		Preload()
+		api.StartServer()
+	}
 }
