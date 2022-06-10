@@ -40,6 +40,8 @@ func Search(query string) *searchResult {
 		}
 		crossResult = set.Cross(crossResult, queryWordDocs[i])
 	}
+
+	// 排除所有的过滤词
 	ret := &searchResult{
 		Words:  queryWords,
 		DocIds: crossResult,

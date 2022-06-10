@@ -3,6 +3,7 @@ package api
 const (
 	Success = iota
 	UnknownError
+	RequestFormatError
 )
 
 type Response struct {
@@ -23,12 +24,5 @@ func BuildErrorResponse(code int, msg string) *Response {
 	return &Response{
 		Code: code,
 		Msg:  msg,
-	}
-}
-
-func BuildUnknownErrorResponse(err error) *Response {
-	return &Response{
-		Code: UnknownError,
-		Msg:  err.Error(),
 	}
 }
