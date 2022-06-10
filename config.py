@@ -36,7 +36,7 @@ def get_light_config():
         'importCsvCoroutines': 4,
         'makeInvertedIndexCoroutines': 8,
         'searchLruMaxCapacity': 20,
-        'showMenu': False,
+        'showMenu': True,
         'listenIp': '0.0.0.0',
         'listenPort': 8080,
     }
